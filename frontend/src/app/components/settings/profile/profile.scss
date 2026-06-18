@@ -1,0 +1,79 @@
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 25px 0px 0px 50px;
+  max-width: 680px;
+}
+
+.settings-card {
+  padding: 20px 24px;
+
+  mat-card-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  mat-card-content {
+    margin-top: 16px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    mat-form-field {
+      flex: 1;
+      min-width: 220px;
+    }
+  }
+
+  button[mat-flat-button] {
+    align-self: flex-start;
+    background: var(--mat-sys-primary);
+    color: #ffffff;
+  }
+}
+
+.danger {
+  border: 0.5px solid var(--mat-sys-error);
+
+  .danger-title {
+    color: var(--mat-sys-error);
+  }
+
+  .danger-text {
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 14px;
+    margin: 0 0 16px;
+  }
+
+  button[mat-flat-button].delete-button {
+    background: #E24B4A;
+    color: #ffffff;
+  }
+}
+
+.alert {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 12px;
+
+  &.success {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+
+  &.error {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}

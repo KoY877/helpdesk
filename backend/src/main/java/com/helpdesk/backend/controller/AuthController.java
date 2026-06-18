@@ -1,0 +1,48 @@
+package com.helpdesk.backend.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.helpdesk.backend.Data_Transfert_Object.AuthResponse;
+import com.helpdesk.backend.Data_Transfert_Object.LoginRequest;
+import com.helpdesk.backend.Data_Transfert_Object.UserCreateRequest;
+import com.helpdesk.backend.service.AuthService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    /**
+     * Registers a new user account.
+     *
+     * @param request the registration data (name, email, password)
+     * @return HTTP 201 with an {@link AuthResponse} containing the JWT and user info
+     */
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid UserCreateRequest request) {
+        // Delegate to the service and return 201 Created on success
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
+    /**
+     * Authenticates a user and returns a JWT.
+     *
+     * @param request the login data (email, password)
+     * @return HTTP 200 with an {@link AuthResponse} containing the JWT and user info
+     */
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest request) {
+        // Delegate to the service and return 200 OK with the token
+        return ResponseEntity.ok(authService.login(request));
+    }
+}

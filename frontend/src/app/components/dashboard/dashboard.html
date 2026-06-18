@@ -1,0 +1,121 @@
+
+
+<div class="dashboard-container">
+
+  <!-- Header with the page title and the create-ticket button -->
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+
+    <button mat-flat-button class="btn-newTicket" (click)="openDialog()">
+      <mat-icon>add</mat-icon>
+      New Ticket
+    </button>
+  </div>
+
+  <!-- Summary cards: counters per ticket status -->
+  <div class="mat-cards">
+    <mat-card>
+      <mat-card-header>Total tickets</mat-card-header>
+      <mat-card-content class="card-color-total">{{ countTotal() }}</mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header>Open</mat-card-header>
+      <mat-card-content class="card-color-open">{{ countIsOpen() }}</mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header>In progress</mat-card-header>
+      <mat-card-content class="card-color-progress">{{ countIsInProgress() }}</mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header>Resolved</mat-card-header>
+      <mat-card-content class="card-color-resolved">{{ countIsResolved() }}</mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Recent tickets table with a live search box -->
+  <div class="tableLayout">
+    <div class="table-header">
+      Recent tickets
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input (keyup)="applyFilter($event)" placeholder="Search tickets..." #input>
+      </div>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="order">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let ticket; let i = index">{{ i + 1 }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let ticket">{{ ticket.title }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let ticket">{{ ticket.description }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let ticket">
+          <span [class]="statusClass(ticket.status)">
+            {{ ticket.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let ticket">{{ ticket.createdAt | date:'long' }}</td>
+      </ng-container>
+
+      <!-- Action buttons depend on the ticket status and the user's role -->
+      <ng-container matColumnDef="Actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let ticket">
+          <div class="button-row">
+            <!-- Offer only the transition(s) valid for the current status -->
+            @switch (ticket.status) {
+              @case ('OPEN') {
+                <!-- Only agents/admins can pick up an open ticket -->
+                @if (role === 'AGENT' || role === 'ADMIN') {
+                  <button mat-stroked-button (click)="handleAssign(ticket.id)">Assign</button>
+                }
+              }
+              @case ('IN_PROGRESS') {
+                <button mat-stroked-button (click)="handleTransition(ticket.id, 'RESOLVED')">Resolve</button>
+              }
+              @case ('RESOLVED') {
+                @if (role === 'AGENT' || role === 'ADMIN') {
+                  <button mat-stroked-button (click)="handleTransition(ticket.id, 'CLOSED')">Close</button>
+                }
+              }
+              @case ('CLOSED') {
+                <button mat-stroked-button (click)="handleTransition(ticket.id, 'IN_PROGRESS')">Reopen</button>
+              }
+            }
+            <!-- Admins may delete a ticket only while it is still OPEN -->
+            @if (role === 'ADMIN' && ticket.status === 'OPEN'){
+              <button mat-flat-button class="btn-delete" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">Delete</button>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                  showFirstLastButtons
+                  aria-label="Select page of tickets" >
+    </mat-paginator>
+  </div>
+
+</div>
+
+

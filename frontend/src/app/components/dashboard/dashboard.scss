@@ -1,0 +1,146 @@
+
+.dashboard-container {
+  margin: 0 auto;
+  padding: 3rem;
+
+  .dashboard-header{
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+
+    .btn-newTicket{
+      height: 35px;
+      font-size: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      border: 0.5px solid var(--mat-sys-outline-variant);
+      background-color: var(--mat-sys-secondary-container);
+      color: var(--mat-sys-on-secondary-container);
+      border-radius: 5px;
+      padding: 5px;
+
+      mat-icon {
+        font-size: 21px;
+        padding: 5px;
+      }
+    }
+  }
+}
+
+.mat-cards{
+  width: 100%;
+  height: 100px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-items:start;
+  padding-bottom: 30px;
+
+  mat-card{
+    width: calc(100% / 4);
+    justify-content: center;
+    align-items: center;
+
+    mat-card-header{
+      font-size: 18px;
+    }
+
+    mat-card-content{
+      padding-top: 10px;
+      font-size: 25px;
+      font-weight: 600;
+    }
+  }
+}
+
+.tableLayout{
+  width: 100%;
+  border: 0.5px solid var(--mat-sys-secondary-container);
+  border-radius: 10px;
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-size: 25px;
+    background-color: var(--mat-sys-secondary-container);
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #1e1e2e;
+      border-radius: 50px;
+      padding: 8px 16px;
+      width: 240px;
+
+      mat-icon {
+        color: #aaaaaa;
+        font-size: 18px;
+        line-height: 18px;
+      }
+
+      input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #ffffff;
+        font-size: 14px;
+        width: 100%;
+
+        &::placeholder {
+          color: #888888;
+        }
+      }
+    }
+  }
+}
+
+table {
+  width: 100%;
+
+  .mdc-data-table__row:last-child > .mat-mdc-cell{
+    border-bottom: none;
+    padding: 15px;
+  }
+}
+
+.status-OPEN        { background: #e3f2fd; color: #1565c0; }
+.status-IN_PROGRESS { background: #fff3e0; color: #e65100; }
+.status-RESOLVED    { background: #e8f5e9; color: #2e7d32; }
+.status-CLOSED      { background: #eeeeee; color: #616161; }
+
+.card-color-total    { color: #616161; }
+.card-color-open     { color: #1565c0; }
+.card-color-progress { color: #e65100; }
+.card-color-resolved { color: #2e7d32; }
+
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  button {
+    min-width: unset;
+    padding: 0 12px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 13px;
+  }
+
+  .btn-edit {
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+
+  .btn-delete {
+    background-color: var(--mat-sys-error);
+    color: var(--mat-sys-on-error);
+  }
+}
+
+
+

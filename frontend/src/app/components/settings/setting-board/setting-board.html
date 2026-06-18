@@ -1,0 +1,21 @@
+
+
+  <!-- Settings layout: side tabs (Profile/Password) + routed sub-page -->
+  <mat-drawer-container class="container">
+    <mat-drawer mode="side" class="side" opened>
+      <ul class="side-items">
+        <li class="side-item profile" routerLink="/settings/profile" routerLinkActive="active">
+          Profile
+        </li>
+
+        <li class="side-item" routerLink="/settings/password" routerLinkActive="active">
+          Password
+        </li>
+      </ul>
+    </mat-drawer>
+
+    <!-- Selected settings sub-page renders here -->
+    <mat-drawer-content>
+      <router-outlet />
+    </mat-drawer-content>
+  </mat-drawer-container>

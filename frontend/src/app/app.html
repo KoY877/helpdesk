@@ -1,0 +1,49 @@
+<!-- Show the full app shell (navbar + sidenav) on every page except the auth pages -->
+@if (showShell()) {
+  <!-- Top navbar: logo on the left, current user's role and initials on the right -->
+  <nav class="navbar">
+    <div class="logo">
+      <mat-icon>confirmation_number</mat-icon>
+      <span class="project-name">Helpdesk</span>
+    </div>
+
+    <div class="user">
+      <span class="role">{{ role }}</span>
+      <div class="avatar">{{ initials() }}</div>
+    </div>
+  </nav>
+
+  <!-- Main layout: fixed side navigation + routed content area -->
+  <mat-drawer-container class="container">
+    <mat-drawer mode="side" class="side" opened>
+      <ul class="side-items">
+        <li class="side-item" routerLink="/dashboard" routerLinkActive="active">
+          <mat-icon>dashboard</mat-icon> Dashboard
+        </li>
+        <li class="side-item" routerLink="/tickets" routerLinkActive="active">
+          <mat-icon>confirmation_number</mat-icon> Tickets
+        </li>
+          <!-- Users management is only visible to admins -->
+          @if (role === 'ADMIN') {
+            <li class="side-item" routerLink="/users" routerLinkActive="active">
+              <mat-icon>people</mat-icon> Users
+            </li>
+          }
+        <li class="side-item" routerLink="/settings" routerLinkActive="active">
+          <mat-icon>settings</mat-icon> Settings
+        </li>
+        <li class="side-item logout" (click)="logout()">
+          <mat-icon>logout</mat-icon> Logout
+        </li>
+      </ul>
+    </mat-drawer>
+
+    <!-- Routed page content is rendered here -->
+    <mat-drawer-content>
+      <router-outlet />
+    </mat-drawer-content>
+  </mat-drawer-container>
+} @else {
+  <!-- Auth pages (login/register) render full-screen without the shell -->
+  <router-outlet />
+}

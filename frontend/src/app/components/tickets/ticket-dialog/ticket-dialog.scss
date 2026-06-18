@@ -1,0 +1,69 @@
+.ticket-dialog-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  .logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .new-ticket {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .btn-close {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.ticket-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  .error-banner {
+    color: var(--mat-sys-error);
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .field-label {
+    font-size: 13px;
+    font-weight: 600;
+
+    .required {
+      color: var(--mat-sys-error);
+    }
+  }
+}
+
+.ticket-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+
+  .button-row {
+    display: flex;
+    gap: 10px;
+  }
+}

@@ -1,0 +1,57 @@
+
+<!-- Dialog header: title and close button -->
+<div class="ticket-dialog-header">
+  <div class="logo">
+    <mat-icon>local_activity</mat-icon>
+    <span class="new-ticket">New ticket</span>
+  </div>
+  <button mat-icon-button type="button" class="btn-close" (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<!-- Ticket creation form -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="ticket-dialog-content">
+    <!-- Error banner shown when creation fails -->
+    @if (errorMessage) {
+      <div class="error-banner">{{ errorMessage }}</div>
+    }
+
+    <!-- Required title field with validation hints -->
+    <div class="field-group">
+      <label class="field-label">Title <span class="required">*</span></label>
+      <mat-form-field appearance="outline">
+        <input matInput formControlName="title" placeholder="Brief description of the issue">
+        <mat-hint>Be concise — max 100 characters</mat-hint>
+        @if (form.get('title')?.hasError('required')) {
+          <mat-error>Title is required</mat-error>
+        }
+        @if (form.get('title')?.hasError('maxlength')) {
+          <mat-error>Title must be 100 characters or fewer</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Optional description field with a live character counter -->
+    <div class="field-group">
+      <label class="field-label">Description</label>
+      <mat-form-field appearance="outline">
+        <textarea matInput formControlName="description" rows="4"
+          placeholder="Describe the issue in detail — steps to reproduce, expected vs actual behavior..."></textarea>
+        <mat-hint align="end">{{ descriptionLength }} / 1000</mat-hint>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Footer: cancel and submit actions -->
+  <div class="ticket-dialog-footer">
+    <div class="button-row">
+      <button mat-stroked-button type="button" (click)="close()">Cancel</button>
+      <button mat-stroked-button type="submit">
+        <mat-icon>send</mat-icon>
+        Create ticket
+      </button>
+    </div>
+  </div>
+</form>

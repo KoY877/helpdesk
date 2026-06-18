@@ -1,0 +1,57 @@
+<!-- Centered login card -->
+<div class="container">
+
+    <mat-card>
+    <mat-card-header>
+      <mat-card-title>Login</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Reactive login form; submission is handled by the component -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Server-side error feedback (e.g. invalid credentials) -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Email field with required + format validation messages -->
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email">
+          <mat-error *ngIf="form.get('email')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">
+            Invalid email format
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Password field with required + min-length validation messages -->
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password">
+          <mat-error *ngIf="form.get('password')?.hasError('required')">
+            Password is required
+          </mat-error>
+          <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+            Minimum 12 characters
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Submit (disabled while invalid) and link to registration -->
+        <div class="button-row">
+          <button mat-flat-button type="submit" [disabled]="form.invalid" >
+            Sign In
+          </button>
+          <button mat-stroked-button type="button" routerLink="/register">
+            Sign Up
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+
+</div>
