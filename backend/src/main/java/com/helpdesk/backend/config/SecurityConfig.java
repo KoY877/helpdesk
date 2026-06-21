@@ -79,6 +79,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Authentication endpoints are public
                 .requestMatchers("/api/auth/**").permitAll()
+                // Let Spring Boot's error forward render the real status/body instead of
+                // being rejected by this filter chain and masked as a generic 401
+                .requestMatchers("/error").permitAll()
                 // Listing all users is reserved to agents and admins
                 .requestMatchers(HttpMethod.GET, "/api/users/all").hasAnyRole("AGENT", "ADMIN")
                 // Listing all tickets is reserved to agents and admins

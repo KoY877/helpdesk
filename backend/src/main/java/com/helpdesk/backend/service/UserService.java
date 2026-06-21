@@ -3,6 +3,8 @@ package com.helpdesk.backend.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,7 +98,17 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public UserResponse updateRole (UUID id, UserRoleUpdateRequest request) {
+    public UserResponse updateRole(UUID id, UserRoleUpdateRequest request) {
+        // Resolve the currently authenticated user from the security context
+        User currentUser = (User) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        // An admin must not be able to change their own role
+        if (currentUser.getId().equals(id)) {
+            throw new AccessDeniedException("Cannot change your own role");
+        }
+
         // Fetch the existing user or throw if absent
         User user = findOrThrow(id);
 
