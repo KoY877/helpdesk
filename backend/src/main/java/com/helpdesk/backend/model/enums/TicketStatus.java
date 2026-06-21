@@ -9,8 +9,8 @@ public enum TicketStatus {
     private static final Map<TicketStatus, Set<TicketStatus>> ALLOWED = Map.of(
         OPEN,        Set.of(IN_PROGRESS),
         IN_PROGRESS, Set.of(RESOLVED),
-        RESOLVED,    Set.of(CLOSED, IN_PROGRESS),
-        CLOSED,      Set.of()
+        RESOLVED,    Set.of(CLOSED),
+        CLOSED,      Set.of( IN_PROGRESS)
     );
 
     public boolean canTransitionTo(TicketStatus next) {
