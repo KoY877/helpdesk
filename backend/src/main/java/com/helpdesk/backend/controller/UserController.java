@@ -40,6 +40,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing a list of all {@link User} objects
      */
     @GetMapping("/all")
+    @PreAuthorize("hasRole('AGENT', 'ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         // Delegate to the service and return the full list of users
         return ResponseEntity.ok(userService.getAllUsers());
@@ -52,6 +53,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing the user data {@link UserResponse} 
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id){
         // Delegate the lookup to the service
         return ResponseEntity.ok(userService.findById(id));
@@ -65,6 +67,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing the updated {@link UserResponse}
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id, @RequestBody UserUpdateRequest request){
         // Delegate the partial update to the service
         return ResponseEntity.ok(userService.updateUser(id, request));
@@ -77,6 +80,7 @@ public class UserController {
      * @return a {@link ResponseEntity} with HTTP 204 and no content
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> deleteUser(@PathVariable UUID id){
         // Delete the user then return an empty 204 response
         userService.deleteUser(id);
