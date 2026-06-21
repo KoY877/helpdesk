@@ -9,24 +9,24 @@ class TicketstatusTest {
 
     @Test
     void open_canTransitionTo_inProgress() {
-        assertTrue(Ticketstatus.OPEN.canTransitionTo(Ticketstatus.IN_PROGRESS));
+        assertTrue(TicketStatus.OPEN.canTransitionTo(TicketStatus.IN_PROGRESS));
     }
 
     @Test
     void inProgress_canTransitionTo_resolved() {
-        assertTrue(Ticketstatus.IN_PROGRESS.canTransitionTo(Ticketstatus.RESOLVED));
+        assertTrue(TicketStatus.IN_PROGRESS.canTransitionTo(TicketStatus.RESOLVED));
     }
 
     @Test
     void resolved_canTransitionTo_closed() {
-        assertTrue(Ticketstatus.RESOLVED.canTransitionTo(Ticketstatus.CLOSED));
+        assertTrue(TicketStatus.RESOLVED.canTransitionTo(TicketStatus.CLOSED));
     }
 
     @Test
     void closed_cannotTransitionTo_anything() {
-        assertFalse(Ticketstatus.CLOSED.canTransitionTo(Ticketstatus.OPEN));
-        assertFalse(Ticketstatus.CLOSED.canTransitionTo(Ticketstatus.IN_PROGRESS));
-        assertFalse(Ticketstatus.CLOSED.canTransitionTo(Ticketstatus.RESOLVED));
-        assertFalse(Ticketstatus.CLOSED.canTransitionTo(Ticketstatus.CLOSED));
+        assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.OPEN));
+        assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.IN_PROGRESS));
+        assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.RESOLVED));
+        assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.CLOSED));
     }
 }

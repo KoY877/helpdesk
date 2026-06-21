@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.helpdesk.backend.Data_Transfert_Object.AuthResponse;
-import com.helpdesk.backend.Data_Transfert_Object.LoginRequest;
-import com.helpdesk.backend.Data_Transfert_Object.UserCreateRequest;
+import com.helpdesk.backend.dto.AuthResponse;
+import com.helpdesk.backend.dto.LoginRequest;
+import com.helpdesk.backend.dto.UserCreateRequest;
 import com.helpdesk.backend.exception.EmailAlreadyExistsException;
 import com.helpdesk.backend.model.User;
 import com.helpdesk.backend.model.enums.Role;
@@ -36,7 +37,7 @@ public class AuthServiceTest {
     @Test
     void register_withNewEmail_returnsAuthResponse() {
         User user = new User();
-        user.setId("u1");
+        user.setId(UUID.randomUUID());
         user.setName("Kodjo");
         user.setEmail("test@test.com");
         user.setPassword("encoded");

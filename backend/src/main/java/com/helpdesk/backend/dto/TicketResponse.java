@@ -1,18 +1,19 @@
-package com.helpdesk.backend.Data_Transfert_Object;
+package com.helpdesk.backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-import com.helpdesk.backend.model.enums.Ticketstatus;
+import com.helpdesk.backend.model.enums.TicketStatus;
 
 public record TicketResponse(
-    String id,
+    UUID id,
     int order,
     String title,
     String description,
-    Ticketstatus status,
-    String createdById,
+    TicketStatus status,
+    UUID createdById,
     String createdByName,
-    String assignedToId,
+    UUID assignedToId,
     String assignedToName,
     LocalDateTime createdAt
 ) {}

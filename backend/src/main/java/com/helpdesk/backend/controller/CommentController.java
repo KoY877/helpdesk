@@ -3,9 +3,10 @@ package com.helpdesk.backend.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
-import com.helpdesk.backend.Data_Transfert_Object.CommentCreateRequest;
-import com.helpdesk.backend.Data_Transfert_Object.CommentResponse;
+import com.helpdesk.backend.dto.CommentCreateRequest;
+import com.helpdesk.backend.dto.CommentResponse;
 import com.helpdesk.backend.service.CommentService;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class CommentController {
     @GetMapping("/api/tickets/{ticketId}/comments")
     @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<List<CommentResponse>> getTicketComments(
-        @PathVariable String ticketId) {
+        @PathVariable UUID ticketId) {
 
         // Delegate to the service which validates the ticket and maps the comments
         return ResponseEntity.ok(commentService.getCommentsByTicket(ticketId));
@@ -55,7 +56,7 @@ public class CommentController {
     @PostMapping("/api/tickets/{ticketId}/comments")
     @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<CommentResponse> createComment(
-        @PathVariable String ticketId,
+        @PathVariable UUID ticketId,
         @RequestBody @Valid CommentCreateRequest request,
         @AuthenticationPrincipal UserDetails userDetails) {
 

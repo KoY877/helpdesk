@@ -1,6 +1,7 @@
 package com.helpdesk.backend.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.helpdesk.backend.Data_Transfert_Object.TicketAssignRequest;
-import com.helpdesk.backend.Data_Transfert_Object.TicketCreateRequest;
-import com.helpdesk.backend.Data_Transfert_Object.TicketResponse;
-import com.helpdesk.backend.Data_Transfert_Object.TicketStatusUpdateRequest;
-import com.helpdesk.backend.Data_Transfert_Object.TicketUpdateRequest;
+import com.helpdesk.backend.dto.TicketAssignRequest;
+import com.helpdesk.backend.dto.TicketCreateRequest;
+import com.helpdesk.backend.dto.TicketResponse;
+import com.helpdesk.backend.dto.TicketStatusUpdateRequest;
+import com.helpdesk.backend.dto.TicketUpdateRequest;
 import com.helpdesk.backend.service.TicketService;
 
 import jakarta.validation.Valid;
@@ -68,7 +69,7 @@ public class TicketController {
      * @return HTTP 200 with the matching ticket
      */
     @GetMapping("/{id}")
-    public ResponseEntity<TicketResponse> getTicketById(@PathVariable @NotNull String id) {
+    public ResponseEntity<TicketResponse> getTicketById(@PathVariable @NotNull UUID id) {
         // Delegate the lookup to the service
         return ResponseEntity.ok(ticketService.getTicketById(id));
     }
@@ -80,7 +81,7 @@ public class TicketController {
      * @return HTTP 200 with the list of tickets created by the user
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TicketResponse>> getTicketsByUserId(@PathVariable @NotNull String userId) {
+    public ResponseEntity<List<TicketResponse>> getTicketsByUserId(@PathVariable @NotNull UUID userId) {
         // Delegate the lookup to the service
         return ResponseEntity.ok(ticketService.getTicketsByUserId(userId));
     }
@@ -111,7 +112,7 @@ public class TicketController {
      */
     @PatchMapping("/{id}")
     public ResponseEntity<TicketResponse> updateTicket(
-            @PathVariable @NotNull String id,
+            @PathVariable @NotNull UUID id,
             @RequestBody @Valid TicketUpdateRequest request) {
         // Delegate the update to the service
         return ResponseEntity.ok(ticketService.updateTicket(id, request));
@@ -128,7 +129,7 @@ public class TicketController {
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<TicketResponse> updateTicketStatus(
-            @PathVariable @NotNull String id,
+            @PathVariable @NotNull UUID id,
             @RequestBody @Valid TicketStatusUpdateRequest request,
             @AuthenticationPrincipal UserDetails userDetails
         ) {
@@ -146,7 +147,7 @@ public class TicketController {
     @PatchMapping("/{id}/assign")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<TicketResponse> assignTicket(
-            @PathVariable @NotNull String id,
+            @PathVariable @NotNull UUID id,
             @RequestBody @Valid TicketAssignRequest request) {
         // Delegate the assignment to the service
         return ResponseEntity.ok(ticketService.assignTicket(id, request.assignedToId()));
@@ -159,7 +160,7 @@ public class TicketController {
      * @return HTTP 204 with no content
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTicket(@PathVariable @NotNull String id) {
+    public ResponseEntity<Void> deleteTicket(@PathVariable @NotNull UUID id) {
         // Delete the ticket then return an empty 204 response
         ticketService.deleteTicket(id);
         return ResponseEntity.noContent().build();

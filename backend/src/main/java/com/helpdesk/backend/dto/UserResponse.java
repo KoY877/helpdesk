@@ -1,11 +1,12 @@
-package com.helpdesk.backend.Data_Transfert_Object;
+package com.helpdesk.backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.helpdesk.backend.model.enums.Role;
 
 public record UserResponse(
-    String id,
+    UUID id,
     String name,
     String email,
     Role role,

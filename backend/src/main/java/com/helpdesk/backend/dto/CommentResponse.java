@@ -1,12 +1,13 @@
-package com.helpdesk.backend.Data_Transfert_Object;
+package com.helpdesk.backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record CommentResponse (
-    String id,
+    UUID id,
     String content,
-    String ticketId,
-    String authorId,
+    UUID ticketId,
+    UUID authorId,
     String authorName,
     String authorRole,
     LocalDateTime createdAt

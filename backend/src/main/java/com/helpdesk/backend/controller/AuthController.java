@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.helpdesk.backend.Data_Transfert_Object.AuthResponse;
-import com.helpdesk.backend.Data_Transfert_Object.LoginRequest;
-import com.helpdesk.backend.Data_Transfert_Object.UserCreateRequest;
+import com.helpdesk.backend.dto.AuthResponse;
+import com.helpdesk.backend.dto.LoginRequest;
+import com.helpdesk.backend.dto.UserCreateRequest;
 import com.helpdesk.backend.service.AuthService;
 
 import jakarta.validation.Valid;

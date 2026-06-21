@@ -1,16 +1,16 @@
 package com.helpdesk.backend.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import com.helpdesk.backend.Data_Transfert_Object.UserMapper;
-import com.helpdesk.backend.Data_Transfert_Object.UserResponse;
-import com.helpdesk.backend.Data_Transfert_Object.UserRoleUpdateRequest;
-import com.helpdesk.backend.Data_Transfert_Object.UserUpdateRequest;
+import com.helpdesk.backend.dto.UserMapper;
+import com.helpdesk.backend.dto.UserResponse;
+import com.helpdesk.backend.dto.UserRoleUpdateRequest;
+import com.helpdesk.backend.dto.UserUpdateRequest;
 import com.helpdesk.backend.exception.ResourceNotFoundException;
 import com.helpdesk.backend.model.User;
 import com.helpdesk.backend.repository.UserRepository;
@@ -54,7 +54,7 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public void deleteUser(String id) {
+    public void deleteUser(UUID id) {
         // Make sure the user exists before attempting to delete
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User: "+ id);
@@ -73,7 +73,7 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public UserResponse updateUser(String id, UserUpdateRequest request) {
+    public UserResponse updateUser(UUID id, UserUpdateRequest request) {
         // Fetch the existing user or throw if absent
         User user = findOrThrow(id);
 
@@ -96,7 +96,7 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public UserResponse updateRole (String id, UserRoleUpdateRequest request) {
+    public UserResponse updateRole (UUID id, UserRoleUpdateRequest request) {
         // Fetch the existing user or throw if absent
         User user = findOrThrow(id);
 
@@ -114,7 +114,7 @@ public class UserService{
      * @return the matching user as a {@link UserResponse}
      * @throws ResourceNotFoundException if no user matches the id
      */
-    public UserResponse findById(String id){
+    public UserResponse findById(UUID id){
         // Delegate the lookup and map the result to a DTO
         return UserMapper.toResponse(findOrThrow(id));
     }
@@ -126,7 +126,7 @@ public class UserService{
      * @return the matching {@link User} entity
      * @throws ResourceNotFoundException if no user matches the id
      */
-    private User findOrThrow(String id){
+    private User findOrThrow(UUID id){
         // Return the user or raise a not-found exception
         return userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));

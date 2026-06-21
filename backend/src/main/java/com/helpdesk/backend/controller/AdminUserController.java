@@ -1,5 +1,7 @@
 package com.helpdesk.backend.controller;
 
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -8,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.helpdesk.backend.Data_Transfert_Object.UserResponse;
-import com.helpdesk.backend.Data_Transfert_Object.UserRoleUpdateRequest;
+import com.helpdesk.backend.dto.UserResponse;
+import com.helpdesk.backend.dto.UserRoleUpdateRequest;
 import com.helpdesk.backend.service.UserService;
 
 import lombok.AllArgsConstructor;
@@ -31,7 +33,7 @@ public class AdminUserController {
      * @return a {@link ResponseEntity} containing the updated {@link UserResponse}
      */
     @PatchMapping("/{id}/role")
-    public ResponseEntity<UserResponse> updateRole(@PathVariable String id,
+    public ResponseEntity<UserResponse> updateRole(@PathVariable UUID id,
                                                     @RequestBody UserRoleUpdateRequest request) {
         // Delegate the role change to the service
         return ResponseEntity.ok(userService.updateRole(id, request));

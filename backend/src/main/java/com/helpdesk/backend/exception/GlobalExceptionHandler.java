@@ -7,7 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.helpdesk.backend.Data_Transfert_Object.ErrorResponse;
+import com.helpdesk.backend.dto.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

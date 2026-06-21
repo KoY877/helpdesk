@@ -1,6 +1,7 @@
 package com.helpdesk.backend.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,9 +9,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.helpdesk.backend.Data_Transfert_Object.UserResponse;
-import com.helpdesk.backend.Data_Transfert_Object.UserRoleUpdateRequest;
-import com.helpdesk.backend.Data_Transfert_Object.UserUpdateRequest;
+import com.helpdesk.backend.dto.UserResponse;
+import com.helpdesk.backend.dto.UserRoleUpdateRequest;
+import com.helpdesk.backend.dto.UserUpdateRequest;
 import com.helpdesk.backend.service.UserService;
 
 import lombok.AllArgsConstructor;
@@ -51,7 +52,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing the user data {@link UserResponse} 
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable String id){
+    public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id){
         // Delegate the lookup to the service
         return ResponseEntity.ok(userService.findById(id));
     }
@@ -64,7 +65,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing the updated {@link UserResponse}
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request){
+    public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id, @RequestBody UserUpdateRequest request){
         // Delegate the partial update to the service
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
@@ -76,7 +77,7 @@ public class UserController {
      * @return a {@link ResponseEntity} with HTTP 204 and no content
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserResponse> deleteUser(@PathVariable String id){
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable UUID id){
         // Delete the user then return an empty 204 response
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
@@ -91,7 +92,7 @@ public class UserController {
      */
     @PatchMapping("/admin/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> updateRole(@PathVariable String id, @RequestBody UserRoleUpdateRequest request){
+    public ResponseEntity<UserResponse> updateRole(@PathVariable UUID id, @RequestBody UserRoleUpdateRequest request){
         // Only admins reach this point; delegate the role change to the service
         return ResponseEntity.ok(userService.updateRole(id, request));
     }

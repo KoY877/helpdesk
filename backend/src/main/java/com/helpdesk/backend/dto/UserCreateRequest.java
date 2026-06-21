@@ -1,4 +1,4 @@
-package com.helpdesk.backend.Data_Transfert_Object;
+package com.helpdesk.backend.dto;
 
 
 public record UserCreateRequest(

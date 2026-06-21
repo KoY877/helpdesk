@@ -4,9 +4,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.helpdesk.backend.Data_Transfert_Object.AuthResponse;
-import com.helpdesk.backend.Data_Transfert_Object.LoginRequest;
-import com.helpdesk.backend.Data_Transfert_Object.UserCreateRequest;
+import com.helpdesk.backend.dto.AuthResponse;
+import com.helpdesk.backend.dto.LoginRequest;
+import com.helpdesk.backend.dto.UserCreateRequest;
 import com.helpdesk.backend.exception.EmailAlreadyExistsException;
 import com.helpdesk.backend.model.User;
 import com.helpdesk.backend.model.enums.Role;

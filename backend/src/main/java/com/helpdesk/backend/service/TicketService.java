@@ -1,22 +1,23 @@
 package com.helpdesk.backend.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import com.helpdesk.backend.Data_Transfert_Object.TicketCreateRequest;
-import com.helpdesk.backend.Data_Transfert_Object.TicketMapper;
-import com.helpdesk.backend.Data_Transfert_Object.TicketResponse;
-import com.helpdesk.backend.Data_Transfert_Object.TicketUpdateRequest;
+import com.helpdesk.backend.dto.TicketCreateRequest;
+import com.helpdesk.backend.dto.TicketMapper;
+import com.helpdesk.backend.dto.TicketResponse;
+import com.helpdesk.backend.dto.TicketUpdateRequest;
 import com.helpdesk.backend.exception.InvalidTransitionException;
 import com.helpdesk.backend.exception.ResourceNotFoundException;
 import com.helpdesk.backend.model.Ticket;
 import com.helpdesk.backend.model.User;
 import com.helpdesk.backend.model.enums.Role;
-import com.helpdesk.backend.model.enums.Ticketstatus;
+import com.helpdesk.backend.model.enums.TicketStatus;
 import com.helpdesk.backend.repository.TicketRepository;
 import com.helpdesk.backend.repository.UserRepository;
 
@@ -52,7 +53,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket matches the id
      */
     @Transactional
-    public TicketResponse getTicketById(@NotNull String id) {
+    public TicketResponse getTicketById(@NotNull UUID id) {
         // Find the ticket, map it, or throw if it is missing
         return ticketRepository.findById(id).map(TicketMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
@@ -66,7 +67,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if the user does not exist
      */
     @Transactional
-    public List<TicketResponse> getTicketsByUserId(@NotNull String userId) {
+    public List<TicketResponse> getTicketsByUserId(@NotNull UUID userId) {
         // Make sure the user exists before querying their tickets
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User not found: " + userId);
@@ -115,7 +116,7 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setTitle(request.title());
         ticket.setDescription(request.description());
-        ticket.setStatus(Ticketstatus.OPEN);
+        ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedBy(creator);
         // Place the ticket at the end of the ordering sequence
         ticket.setOrder(ticketRepository.findMaxOrder() + 1);
@@ -135,7 +136,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket matches the id
      */
     @Transactional
-    public TicketResponse updateTicket(@NotNull String id, TicketUpdateRequest request) {
+    public TicketResponse updateTicket(@NotNull UUID id, TicketUpdateRequest request) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
@@ -158,13 +159,13 @@ public class TicketService {
      * @throws InvalidTransitionException if the ticket cannot move to IN_PROGRESS
      */
     @Transactional
-    public TicketResponse assignTicket(@NotNull String ticketId, @NotNull String assignedToId) {
+    public TicketResponse assignTicket(@NotNull UUID ticketId, @NotNull UUID assignedToId) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketId));
 
         // Assigning implies moving to IN_PROGRESS, so validate that transition first
-        if (!ticket.getStatus().canTransitionTo(Ticketstatus.IN_PROGRESS)) {
+        if (!ticket.getStatus().canTransitionTo(TicketStatus.IN_PROGRESS)) {
             throw new InvalidTransitionException(
                 "Cannot assign ticket in status " + ticket.getStatus());
         }
@@ -175,7 +176,7 @@ public class TicketService {
 
         // Apply the assignment and advance the status
         ticket.setAssignedTo(assignedTo);
-        ticket.setStatus(Ticketstatus.IN_PROGRESS);
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
 
         // Log only ids, then persist and return
         log.info("Ticket id: {} assigned to user id: {}", ticketId, assignedToId);
@@ -189,7 +190,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket matches the id
      */
     @Transactional
-    public void deleteTicket(@NotNull String id) {
+    public void deleteTicket(@NotNull UUID id) {
         // Make sure the ticket exists before attempting to delete
         if (!ticketRepository.existsById(id)) {
             throw new ResourceNotFoundException("Ticket not found: " + id);
@@ -215,7 +216,7 @@ public class TicketService {
      * @throws InvalidTransitionException if the transition is not allowed by the state machine
      */
     @Transactional
-    public TicketResponse transition(@NotNull String id, Ticketstatus targetStatus, String userEmail) {
+    public TicketResponse transition(@NotNull UUID id, TicketStatus targetStatus, String userEmail) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
@@ -229,8 +230,8 @@ public class TicketService {
         // A USER may only resolve their own ticket while it is IN_PROGRESS
         boolean isUserAllowed = user.getRole() == Role.USER
                 && isCreator
-                && ticket.getStatus() == Ticketstatus.IN_PROGRESS
-                && targetStatus == Ticketstatus.RESOLVED;
+                && ticket.getStatus() == TicketStatus.IN_PROGRESS
+                && targetStatus == TicketStatus.RESOLVED;
 
         // Agents and admins may perform any valid transition
         boolean isAgentOrAdmin = user.getRole() == Role.AGENT || user.getRole() == Role.ADMIN;

@@ -1,11 +1,12 @@
 package com.helpdesk.backend.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.helpdesk.backend.model.enums.Ticketstatus;
+import com.helpdesk.backend.model.enums.TicketStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,8 +33,7 @@ import lombok.Setter;
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false, updatable = false)
-    private String id;
+    private UUID id;
 
     @Column(nullable = false)
     private String title;
@@ -46,7 +46,7 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Ticketstatus status = Ticketstatus.OPEN;
+    private TicketStatus status = TicketStatus.OPEN;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
