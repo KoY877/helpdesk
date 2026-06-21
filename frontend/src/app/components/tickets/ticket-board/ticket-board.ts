@@ -15,6 +15,7 @@ import { MatMenuModule } from "@angular/material/menu";
 import { UserService } from '../../../core/services/UserService';
 import { Users } from '../../../core/models/user.model';
 import { MatButtonModule } from '@angular/material/button';
+import { CommentComponent } from '../comment/comment';
 
 @Component({
   selector: 'app-ticket-board',
@@ -116,6 +117,26 @@ export class TicketBoardComponent {
     const dialogRef = this.dialog.open(TicketDialogComponent, { width: '500px' });
     dialogRef.afterClosed().subscribe(result => {
       // A truthy result means a ticket was created
+      if (result) this.loadTickets();
+    });
+  }
+
+  /**
+   * Opens the comment dialog for a given ticket. The ticket is forwarded to the
+   * dialog through Angular Material's `data` option so it can be displayed there.
+   * @param ticket the ticket whose comments are being viewed/added
+   */
+  openDialogComment(ticket: Ticket): void {
+    const dialogRef = this.dialog.open(CommentComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      // Custom panel class strips the default white padding for the dark design
+      panelClass: 'comment-dialog',
+      // Pass the selected ticket to CommentComponent via MAT_DIALOG_DATA
+      data: { ticket },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      // A truthy result means a comment was added; refresh the list
       if (result) this.loadTickets();
     });
   }

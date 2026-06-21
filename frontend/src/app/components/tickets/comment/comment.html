@@ -1,0 +1,70 @@
+<div class="ticket-detail">
+
+  <!-- Back navigation: closes the dialog -->
+  <button type="button" class="back-link" (click)="close()">
+    <mat-icon>arrow_back</mat-icon>
+    Back to tickets
+  </button>
+
+  <!-- Ticket summary header (data from MAT_DIALOG_DATA) -->
+  <section class="ticket-card">
+    <div class="ticket-card__top">
+      <h1 class="ticket-card__title">{{ ticket.title }}</h1>
+      <span class="status-badge" [class]="'status-' + ticket.status">
+        {{ ticket.status }}
+      </span>
+    </div>
+
+    <p class="ticket-card__desc">{{ ticket.description }}</p>
+
+    <div class="ticket-card__meta">
+      <span><mat-icon>person</mat-icon> Created by {{ ticket.createdByName }}</span>
+      <span><mat-icon>assignment_ind</mat-icon> Assigned to {{ ticket.assignedToName ?? '—' }}</span>
+      <span><mat-icon>schedule</mat-icon> {{ ticket.createdAt | date:'d MMM y' }}</span>
+    </div>
+  </section>
+
+  <!-- Conversation thread -->
+  <h2 class="conversation-title">Conversation</h2>
+
+  <div class="conversation">
+    @for (comment of comments(); track $index) {
+      <article class="message">
+        <div class="avatar">{{ initials(comment.authorName) }}</div>
+        <div class="message__body">
+          <div class="message__head">
+            <span class="message__author">{{ comment.authorName }}</span>
+            <span class="role-badge">{{ comment.authorRole }}</span>
+            <span class="message__time">{{ comment.createdAt | date:'d MMM, HH:mm' }}</span>
+          </div>
+          <p class="message__text">{{ comment.content }}</p>
+        </div>
+      </article>
+    } @empty {
+      <!-- No GET-comments endpoint yet: thread starts empty -->
+      <p class="conversation__empty">No comments yet. Start the conversation below.</p>
+    }
+  </div>
+
+  <!-- Composer for a new comment -->
+  <form class="composer" [formGroup]="form" (ngSubmit)="onSave()">
+    <textarea
+      formControlName="content"
+      class="composer__input"
+      rows="3"
+      placeholder="Write a comment..."></textarea>
+
+    <!-- Error feedback when posting fails -->
+    @if (errorMessage) {
+      <p class="composer__error">{{ errorMessage }}</p>
+    }
+
+    <div class="composer__actions">
+      <button type="submit" class="composer__submit" [disabled]="form.invalid">
+        <mat-icon>send</mat-icon>
+        Comment
+      </button>
+    </div>
+  </form>
+
+</div>

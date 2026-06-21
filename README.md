@@ -136,5 +136,3 @@ cd backend  && ./mvnw test     # JUnit 5 + Mockito
 cd frontend && npm test        # Vitest
 ```
 
-## License
-Private / unpublished.

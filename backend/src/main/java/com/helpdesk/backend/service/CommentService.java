@@ -3,6 +3,8 @@ package com.helpdesk.backend.service;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 import com.helpdesk.backend.Data_Transfert_Object.CommentCreateRequest;
 import com.helpdesk.backend.Data_Transfert_Object.CommentMapper;
 import com.helpdesk.backend.Data_Transfert_Object.CommentResponse;
@@ -25,9 +27,32 @@ import lombok.extern.slf4j.Slf4j;
 @Validated
 public class CommentService {
 
+   
     private final TicketRepository ticketRepository;
     private final CommentRespository commentRespository;
     private final UserRepository userRepository;
+
+  
+    /**
+     * Returns every comment attached to a ticket, oldest first.
+     *
+     * @param ticketId the unique identifier of the ticket
+     * @return the ticket's comments as {@link CommentResponse} DTOs
+     * @throws ResourceNotFoundException if the ticket does not exist
+     */
+    @Transactional
+    public List<CommentResponse> getCommentsByTicket(@NotNull String ticketId) {
+        // Fail fast if the ticket does not exist
+        if (!ticketRepository.existsById(ticketId)) {
+            throw new ResourceNotFoundException("Ticket not found: " + ticketId);
+        }
+
+        // Fetch the ticket's comments and map each one to its response DTO
+        return commentRespository.findByTicket_IdOrderByCreatedAtAsc(ticketId)
+            .stream()
+            .map(CommentMapper::toResponse)
+            .toList();
+    }
 
     /**
      * Creates a new comment on a ticket and persists it.

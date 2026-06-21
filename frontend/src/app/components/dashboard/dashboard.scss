@@ -97,6 +97,15 @@
       }
     }
   }
+
+  .table-header-item{
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  .title {
+    font-weight: 600;
+  }
 }
 
 table {
@@ -106,6 +115,17 @@ table {
     border-bottom: none;
     padding: 15px;
   }
+
+   // Distribute the columns across the full table width with proportional
+  // widths (they sum to 100%) instead of letting them shrink to content.
+  .mat-column-order      { width: 3%; }
+  .mat-column-title      { width: 15%; }
+  .mat-column-description{ width: 24%; }
+  .mat-column-status     { width: 11%; }
+  .mat-column-assignedTo { width: 12%; }
+  .mat-column-createdBy  { width: 12%; }
+  .mat-column-createdAt  { width: 13%; }
+  .mat-column-Actions    { width: 20%; }
 }
 
 .status-OPEN        { background: #e3f2fd; color: #1565c0; }
@@ -119,9 +139,14 @@ table {
 .card-color-resolved { color: #2e7d32; }
 
 .button-row {
-  display: flex;
+    // Fixed-width columns so each action always sits in the same slot:
+  // status action in col 1, Comment in col 2, Delete in col 3 — aligned
+  // vertically across every row regardless of which buttons are present.
+  display: grid;
+  grid-template-columns: 110px 140px 110px;
   align-items: center;
-  gap: 6px;
+  justify-content: start;
+  gap: 20px;
 
   button {
     min-width: unset;
@@ -130,6 +155,12 @@ table {
     line-height: 30px;
     font-size: 13px;
   }
+
+  // Pin each button type to its column so they line up across all rows
+  .btn-action  { grid-column: 1; }
+  .btn-comment { grid-column: 2; }
+  .btn-delete  { grid-column: 3; }
+
 
   .btn-edit {
     background-color: var(--mat-sys-primary);

@@ -9,9 +9,9 @@
     ports:
       - "5432:5432"
     healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d helpdesk_db"]
-          interval: 5s
-          retries: 5
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d helpdesk_db"]
+      interval: 5s
+      retries: 5
 
   backend:
     build: ./backend
@@ -23,11 +23,17 @@
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-3600000}
+      JWT_EXPIRATION: 3600000
     depends_on:
       postgres:
         condition: service_healthy
-  
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/src
+        - action: rebuild
+          path: ./backend/pom.xml
+
   frontend:
     build: ./frontend
     container_name: helpdesk_frontend
@@ -35,5 +41,10 @@
       - "4200:80"
     depends_on:
       - backend
-
-  
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ./frontend/package.json

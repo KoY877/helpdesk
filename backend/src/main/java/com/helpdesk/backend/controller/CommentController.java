@@ -2,6 +2,8 @@ package com.helpdesk.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import com.helpdesk.backend.Data_Transfert_Object.CommentCreateRequest;
 import com.helpdesk.backend.Data_Transfert_Object.CommentResponse;
 import com.helpdesk.backend.service.CommentService;
@@ -14,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +28,21 @@ import jakarta.validation.Valid;
 @Validated
 public class CommentController {
     private final CommentService commentService;
+
+    /**
+     * Lists every comment attached to a ticket, oldest first.
+     *
+     * @param ticketId the unique identifier of the ticket
+     * @return HTTP 200 with the ticket's comments
+     */
+    @GetMapping("/api/tickets/{ticketId}/comments")
+    @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
+    public ResponseEntity<List<CommentResponse>> getTicketComments(
+        @PathVariable String ticketId) {
+
+        // Delegate to the service which validates the ticket and maps the comments
+        return ResponseEntity.ok(commentService.getCommentsByTicket(ticketId));
+    }
 
     /**
      * Adds a comment to a ticket on behalf of the authenticated user.

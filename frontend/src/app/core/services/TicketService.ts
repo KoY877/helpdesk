@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Ticket, TicketAssignRequest, TicketCreateRequest, TicketStatusRequest } from '../models/ticket.model';
 import { Observable } from 'rxjs';
 import { environement } from '../environements/environements';
+import { Comment, CommentRequest } from '../models/comment.model';
 
 /**
  * Client-side gateway to the ticket-related REST endpoints.
@@ -91,5 +92,24 @@ export class TicketService {
    */
   deleteTicket( id: string): Observable<void>{
     return this.http.delete<void> (`${this.apiUrl}/tickets/${id}`);
+  }
+
+  /**
+   * Adds a comment to a ticket on behalf of the authenticated user.
+   * @param id the ticket's unique identifier
+   * @param request the comment data (content)
+   * @returns an Observable emitting the created comment
+   */
+  commentTicket(id: string, request: CommentRequest ): Observable<Comment> {
+    return this.http.post<Comment> (`${this.apiUrl}/tickets/${id}/comments`, request);
+  }
+
+  /**
+   * Fetches every comment attached to a ticket, oldest first.
+   * @param id the ticket's unique identifier
+   * @returns an Observable emitting the ticket's comments
+   */
+  getTicketComments(id: string): Observable<Comment[]> {
+    return this.http.get<Comment[]> (`${this.apiUrl}/tickets/${id}/comments`);
   }
 }

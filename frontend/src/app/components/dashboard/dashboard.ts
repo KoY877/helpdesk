@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TicketDialogComponent } from '../tickets/ticket-dialog/ticket-dialog';
+import { CommentComponent } from '../tickets/comment/comment';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,7 +37,7 @@ export class DashboardComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   // Columns rendered by the Material table
-  displayedColumns: string[] = ['order', 'title', 'description', 'status', 'createdAt', 'Actions'];
+  displayedColumns: string[] = [ 'title', 'description', 'status', 'createdAt', 'Actions'];
   // Current user's role, drives which actions are available
   role: string | null = null;
 
@@ -108,6 +109,26 @@ export class DashboardComponent {
         this.countIsResolved.set(tickets.filter(t => t.status === 'RESOLVED').length);
       },
       error: (err) => console.error(err),
+    });
+  }
+
+  /**
+   * Opens the comment dialog for a given ticket. The ticket is forwarded to the
+   * dialog through Angular Material's `data` option so it can be displayed there.
+   * @param ticket the ticket whose comments are being viewed/added
+   */
+  openDialogComment(ticket: Ticket): void {
+    const dialogRef = this.dialog.open(CommentComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      // Custom panel class strips the default white padding for the dark design
+      panelClass: 'comment-dialog',
+      // Pass the selected ticket to CommentComponent via MAT_DIALOG_DATA
+      data: { ticket },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      // A truthy result means a comment was added; refresh the list
+      if (result) this.loadTickets();
     });
   }
 

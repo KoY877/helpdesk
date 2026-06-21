@@ -71,3 +71,11 @@ body {
   font-size: 11px;
   font-weight: 500;
 }
+
+// Comment dialog: drop the default padding so the ticket-detail view
+// (CommentComponent) renders edge-to-edge inside the dialog surface.
+.comment-dialog .mat-mdc-dialog-surface {
+  padding: 0;
+  border-radius: 12px;
+  background: var(--mat-sys-surface);
+}

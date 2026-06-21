@@ -32,15 +32,15 @@
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
       <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef>Title</th>
-        <td mat-cell *matCellDef="let ticket">
-          {{ ticket.title }} <br>
+        <th mat-header-cell *matHeaderCellDef class="table-header">Title</th>
+        <td mat-cell *matCellDef="let ticket" >
+          <span class="title">{{ ticket.title }}</span> <br>
           {{ ticket.description }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header">Status</th>
         <td mat-cell *matCellDef="let ticket">
           <span [class]="statusClass(ticket.status)">
             {{ ticket.status }}
@@ -50,27 +50,27 @@
 
 
       <ng-container matColumnDef="assignedTo">
-        <th mat-header-cell *matHeaderCellDef>Assigned To</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header">Assigned To</th>
         <td mat-cell *matCellDef="let ticket">
           {{ ticket.assignedToName ?? '—' }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="createdBy">
-        <th mat-header-cell *matHeaderCellDef>Created by</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header">Created by</th>
         <td mat-cell *matCellDef="let ticket">
           {{ ticket.createdByName }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header">Created</th>
         <td mat-cell *matCellDef="let ticket">{{ ticket.createdAt | date:'short' }}</td>
       </ng-container>
 
       <!-- Action buttons depend on the ticket status and the user's role -->
       <ng-container matColumnDef="Actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header">Actions</th>
         <td mat-cell *matCellDef="let ticket">
           <div class="button-row">
             <!-- Offer only the transition(s) valid for the current status -->
@@ -78,7 +78,7 @@
               @case ('OPEN') {
                 <!-- Admins assign an open ticket by picking an assignee from the menu -->
                 @if (role === 'ADMIN') {
-                  <button mat-stroked-button [matMenuTriggerFor]="assignMenu" >
+                  <button mat-stroked-button [matMenuTriggerFor]="assignMenu" class="btn-column btn-action" >
                     <mat-icon>arrow_drop_down</mat-icon>
                     Assign
                   </button>
@@ -97,22 +97,31 @@
                 }
               }
               @case ('IN_PROGRESS') {
-                <button mat-stroked-button (click)="handleTransition(ticket.id, 'RESOLVED')">Resolve</button>
+                <button mat-stroked-button (click)="handleTransition(ticket.id, 'RESOLVED')" class="btn-column btn-action">Resolve</button>
               }
               @case ('RESOLVED') {
                 @if (role === 'AGENT' || role === 'ADMIN') {
-                  <button mat-stroked-button (click)="handleTransition(ticket.id, 'CLOSED')">Close</button>
+                  <button mat-stroked-button (click)="handleTransition(ticket.id, 'CLOSED')" class="btn-column btn-action">Close</button>
                 }
               }
               @case ('CLOSED') {
-                <button mat-stroked-button (click)="handleTransition(ticket.id, 'IN_PROGRESS')">Reopen</button>
+                <button mat-stroked-button (click)="handleTransition(ticket.id, 'IN_PROGRESS')" class="btn-column btn-action">Reopen</button>
               }
             }
 
+            <button mat-flat-button class="btn-column btn-comment" (click)="openDialogComment(ticket)" >
+              <mat-icon>comment</mat-icon>
+              Comment
+            </button>
+
             <!-- Admins may delete a ticket only while it is still OPEN -->
             @if (role === 'ADMIN' && ticket.status === 'OPEN'){
-              <button mat-flat-button class="btn-delete" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">Delete</button>
+              <button mat-flat-button class="btn-delete btn-column" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">
+                <mat-icon>delete</mat-icon>
+                Delete
+              </button>
             }
+
           </div>
         </td>
       </ng-container>

@@ -44,23 +44,18 @@
 
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
-      <ng-container matColumnDef="order">
-        <th mat-header-cell *matHeaderCellDef>#</th>
-        <td mat-cell *matCellDef="let ticket; let i = index">{{ i + 1 }}</td>
-      </ng-container>
-
       <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef>Title</th>
-        <td mat-cell *matCellDef="let ticket">{{ ticket.title }}</td>
+        <th mat-header-cell *matHeaderCellDef class="table-header-item">Title</th>
+        <td mat-cell *matCellDef="let ticket" class="title">{{ ticket.title }}</td>
       </ng-container>
 
       <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header-item">Description</th>
         <td mat-cell *matCellDef="let ticket">{{ ticket.description }}</td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header-item">Status</th>
         <td mat-cell *matCellDef="let ticket">
           <span [class]="statusClass(ticket.status)">
             {{ ticket.status }}
@@ -69,13 +64,13 @@
       </ng-container>
 
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header-item">Created</th>
         <td mat-cell *matCellDef="let ticket">{{ ticket.createdAt | date:'long' }}</td>
       </ng-container>
 
       <!-- Action buttons depend on the ticket status and the user's role -->
       <ng-container matColumnDef="Actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <th mat-header-cell *matHeaderCellDef class="table-header-item">Actions</th>
         <td mat-cell *matCellDef="let ticket">
           <div class="button-row">
             <!-- Offer only the transition(s) valid for the current status -->
@@ -98,6 +93,12 @@
                 <button mat-stroked-button (click)="handleTransition(ticket.id, 'IN_PROGRESS')">Reopen</button>
               }
             }
+
+            <button mat-flat-button class="btn-column btn-comment" (click)="openDialogComment(ticket)" >
+              <mat-icon>comment</mat-icon>
+              Comment
+            </button>
+
             <!-- Admins may delete a ticket only while it is still OPEN -->
             @if (role === 'ADMIN' && ticket.status === 'OPEN'){
               <button mat-flat-button class="btn-delete" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">Delete</button>

@@ -7,7 +7,9 @@ public record CommentResponse (
     String content,
     String ticketId,
     String authorId,
+    String authorName,
+    String authorRole,
     LocalDateTime createdAt
 ){
-    
+
 }
