@@ -40,7 +40,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing a list of all {@link User} objects
      */
     @GetMapping("/all")
-    @PreAuthorize("hasRole('AGENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         // Delegate to the service and return the full list of users
         return ResponseEntity.ok(userService.getAllUsers());
@@ -53,7 +53,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing the user data {@link UserResponse} 
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER', 'AGENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id){
         // Delegate the lookup to the service
         return ResponseEntity.ok(userService.findById(id));
