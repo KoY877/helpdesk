@@ -43,6 +43,7 @@ public class TicketController {
      * @return HTTP 200 with the list of all tickets
      */
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
     public ResponseEntity<List<TicketResponse>> getAllTickets() {
         // Delegate to the service and return the full list
         return ResponseEntity.ok(ticketService.getAllTickets());

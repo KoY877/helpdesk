@@ -81,6 +81,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Listing all users is reserved to agents and admins
                 .requestMatchers(HttpMethod.GET, "/api/users/all").hasAnyRole("AGENT", "ADMIN")
+                // Listing all tickets is reserved to agents and admins
+                .requestMatchers(HttpMethod.GET, "/api/tickets/all").hasAnyRole("AGENT", "ADMIN")
                 // Reading a single user is allowed to its owner or an admin
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").access(ownerOrAdmin())
                 // Everything else simply requires authentication
