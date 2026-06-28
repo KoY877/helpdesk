@@ -7,6 +7,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
+  box-sizing: border-box;
+}
+
+// Hamburger trigger is only needed once the side drawer hides itself (see
+// the max-width: 768px block below); keep it out of the way on desktop.
+.btn-hamburger {
+  display: none;
 }
 
 .logo {
@@ -115,5 +122,44 @@
       background: var(--mat-sys-error-container);
       color: var(--mat-sys-on-error-container);
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 12px;
+  }
+
+  // Side drawer is replaced by the hamburger menu on small screens
+  .side {
+    display: none;
+  }
+
+  .user {
+    display: none;
+  }
+
+  .btn-hamburger {
+    display: inline-flex;
+  }
+
+  .user-menu {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 5px 20px 5px;
+  }
+
+  .container {
+    height: calc(100vh - 56px);
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-name {
+    display: none;
   }
 }

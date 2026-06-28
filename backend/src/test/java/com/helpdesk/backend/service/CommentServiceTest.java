@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import com.helpdesk.backend.model.enums.Role;
 
@@ -37,17 +36,18 @@ public class CommentServiceTest {
 
     @Test
     void createComment_withValidData_returnsCommentResponse(){
-         // Arrange : utilisateur existant
-        UUID ticketId = UUID.randomUUID();
+        // Arrange : utilisateur existant
+        String ticketId = "t1";
+        String userId = "u1";
 
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId(userId);
 
         Ticket ticket = new Ticket();
         ticket.setId(ticketId);
 
         Comment comment = new Comment();
-        comment.setId(UUID.randomUUID());
+        comment.setId(userId);
         comment.setContent("Lorem Ipsummmmmm");
         comment.setAuthor(user);
         comment.setTicket(ticket);
@@ -65,7 +65,7 @@ public class CommentServiceTest {
 
     @Test
     void createComment_withUnknownTicket_throwsResourceNotFoundException(){
-        UUID ticketId = UUID.randomUUID();
+        String ticketId =  "t1";
         when(ticketRespository.findById(ticketId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
@@ -78,10 +78,10 @@ public class CommentServiceTest {
     @Test
     void getCommentsByTicket_withExistingTicket_returnsMappedComments(){
         // Arrange : an existing ticket with one comment authored by a user
-        UUID ticketId = UUID.randomUUID();
+        String ticketId =  "t1";
 
         User author = new User();
-        author.setId(UUID.randomUUID());
+        author.setId( "u1");
         author.setName("Kodjo");
         author.setRole(Role.AGENT);
 
@@ -89,7 +89,7 @@ public class CommentServiceTest {
         ticket.setId(ticketId);
 
         Comment comment = new Comment();
-        comment.setId(UUID.randomUUID());
+        comment.setId("c1");
         comment.setContent("Looking into it now");
         comment.setAuthor(author);
         comment.setTicket(ticket);
@@ -110,7 +110,7 @@ public class CommentServiceTest {
 
     @Test
     void getCommentsByTicket_withUnknownTicket_throwsResourceNotFoundException(){
-        UUID ticketId = UUID.randomUUID();
+        String ticketId =  "t1";
         when(ticketRespository.existsById(ticketId)).thenReturn(false);
 
         assertThatThrownBy(() -> commentService.getCommentsByTicket(ticketId))

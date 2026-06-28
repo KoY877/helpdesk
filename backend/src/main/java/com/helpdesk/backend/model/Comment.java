@@ -1,7 +1,6 @@
 package com.helpdesk.backend.model;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -27,7 +26,8 @@ import lombok.Setter;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(nullable = false, updatable = false)
+    private String id;
 
     @Column(length = 255, nullable = false)
     private String content;

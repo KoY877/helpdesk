@@ -2,8 +2,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 80%;
+  min-height: 100%;
   background: var(--mat-sys-surface);
+  box-sizing: border-box;
 }
 
 .container {
@@ -47,16 +48,24 @@
 
 .button-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 8px;
 
   button {
     flex: 1;
+    min-width: 120px;
   }
 
   button[mat-flat-button]:not(:disabled) {
     background: var(--mat-sys-primary);
     color: #ffffff;
+  }
+}
+
+@media (max-width: 400px) {
+  .container mat-card {
+    padding: 16px;
   }
 }
 

@@ -8,6 +8,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { UserService } from './core/services/UserService';
+import { MatMenu, MatMenuModule, MatMenuTrigger } from "@angular/material/menu";
 
 // Routes on which the app shell (sidenav, header) must be hidden
 const AUTH_ROUTES = ['/login', '/register'];
@@ -15,7 +16,7 @@ const AUTH_ROUTES = ['/login', '/register'];
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, ReactiveFormsModule,
-    CommonModule, MatSidenavModule, MatIconModule],
+    CommonModule, MatSidenavModule, MatIconModule, MatMenu, MatMenuModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

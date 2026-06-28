@@ -1,7 +1,6 @@
 package com.helpdesk.backend.service;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -53,7 +52,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket matches the id
      */
     @Transactional
-    public TicketResponse getTicketById(@NotNull UUID id) {
+    public TicketResponse getTicketById(@NotNull String id) {
         // Find the ticket, map it, or throw if it is missing
         return ticketRepository.findById(id).map(TicketMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
@@ -67,7 +66,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if the user does not exist
      */
     @Transactional
-    public List<TicketResponse> getTicketsByUserId(@NotNull UUID userId) {
+    public List<TicketResponse> getTicketsByUserId(@NotNull String userId) {
         // Make sure the user exists before querying their tickets
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User not found: " + userId);
@@ -136,7 +135,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket matches the id
      */
     @Transactional
-    public TicketResponse updateTicket(@NotNull UUID id, TicketUpdateRequest request) {
+    public TicketResponse updateTicket(@NotNull String id, TicketUpdateRequest request) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
@@ -159,7 +158,7 @@ public class TicketService {
      * @throws InvalidTransitionException if the ticket cannot move to IN_PROGRESS
      */
     @Transactional
-    public TicketResponse assignTicket(@NotNull UUID ticketId, @NotNull UUID assignedToId) {
+    public TicketResponse assignTicket(@NotNull String ticketId, @NotNull String assignedToId) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketId));
@@ -190,7 +189,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket matches the id
      */
     @Transactional
-    public void deleteTicket(@NotNull UUID id) {
+    public void deleteTicket(@NotNull String id) {
         // Make sure the ticket exists before attempting to delete
         if (!ticketRepository.existsById(id)) {
             throw new ResourceNotFoundException("Ticket not found: " + id);
@@ -216,7 +215,7 @@ public class TicketService {
      * @throws InvalidTransitionException if the transition is not allowed by the state machine
      */
     @Transactional
-    public TicketResponse transition(@NotNull UUID id, TicketStatus targetStatus, String userEmail) {
+    public TicketResponse transition(@NotNull String id, TicketStatus targetStatus, String userEmail) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));

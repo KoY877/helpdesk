@@ -42,6 +42,7 @@
       </div>
     </div>
 
+    <div class="table-scroll">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
       <ng-container matColumnDef="title">
@@ -96,12 +97,15 @@
 
             <button mat-flat-button class="btn-column btn-comment" (click)="openDialogComment(ticket)" >
               <mat-icon>comment</mat-icon>
-              Comment
+              <span class="btn-label">Comment</span>
             </button>
 
             <!-- Admins may delete a ticket only while it is still OPEN -->
             @if (role === 'ADMIN' && ticket.status === 'OPEN'){
-              <button mat-flat-button class="btn-delete" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">Delete</button>
+              <button mat-flat-button class="btn-delete btn-column" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">
+                <mat-icon>delete</mat-icon>
+                <span class="btn-label">Delete</span>
+              </button>
             }
           </div>
         </td>
@@ -110,6 +114,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+    </div>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 20]"
                   showFirstLastButtons

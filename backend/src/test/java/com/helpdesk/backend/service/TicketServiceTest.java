@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,8 +42,8 @@ public class TicketServiceTest {
     @Test
     void createTicket_withValidUser_returnsTicketResponse() {
         // Arrange : utilisateur existant
-        UUID userId = UUID.randomUUID();
-        UUID ticketId = UUID.randomUUID();
+        String userId = "u1";
+        String ticketId = "t1";
 
         User user = new User();
         user.setId(userId);
@@ -91,10 +90,10 @@ public class TicketServiceTest {
     @Test
     void getTicketById_withValidId_returnsTicketResponse() {
         // Arrange
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
 
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId("u1");
 
         Ticket ticket = new Ticket();
         ticket.setId(ticketId);
@@ -118,7 +117,7 @@ public class TicketServiceTest {
     @Test
     void getTicketById_withUnknownId_throwsResourceNotFoundException() {
         // Arrange : ticket absent
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
         when(ticketRepository.findById(ticketId)).thenReturn(Optional.empty());
 
         // Act & Assert
@@ -132,10 +131,10 @@ public class TicketServiceTest {
     @Test
     void transition_fromOpen_toInProgress_succeeds() {
         // Arrange : acteur AGENT (autorisé pour toute transition)
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
 
         User agent = new User();
-        agent.setId(UUID.randomUUID());
+        agent.setId("u1");
         agent.setEmail("agent@test.com");
         agent.setRole(Role.AGENT);
 
@@ -162,10 +161,10 @@ public class TicketServiceTest {
     @Test
     void transition_invalidTransition_throwsInvalidTransitionException() {
         // Arrange : acteur AGENT pour franchir le contrôle d'accès
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
 
         User agent = new User();
-        agent.setId(UUID.randomUUID());
+        agent.setId("u1");
         agent.setEmail("agent@test.com");
         agent.setRole(Role.AGENT);
 
@@ -189,10 +188,10 @@ public class TicketServiceTest {
     @Test
     void transition_asUser_forbiddenTransition_throwsAccessDenied() {
         // Arrange : acteur USER
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
 
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId("u1");
         user.setEmail("user@test.com");
         user.setRole(Role.USER);
 
@@ -216,10 +215,10 @@ public class TicketServiceTest {
     @Test
     void transition_asUser_resolveInProgress_succeeds() {
         // Arrange : acteur USER, ticket IN_PROGRESS
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
 
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId("u1");
         user.setEmail("user@test.com");
         user.setRole(Role.USER);
 
@@ -246,13 +245,13 @@ public class TicketServiceTest {
     @Test
     void transition_asNonCreatorUser_throwsAccessDenied() {
         // Arrange : le ticket appartient à un autre utilisateur
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
 
         User creator = new User();
-        creator.setId(UUID.randomUUID());
+        creator.setId("u1");
 
         User other = new User();
-        other.setId(UUID.randomUUID());
+        other.setId("u2");
         other.setEmail("other@test.com");
         other.setRole(Role.USER);
 
@@ -276,8 +275,8 @@ public class TicketServiceTest {
     @Test
     void getTicketsByUserId_withValidUser_returnsTickets() {
         // Arrange : utilisateur existant avec un ticket
-        UUID userId = UUID.randomUUID();
-        UUID ticketId = UUID.randomUUID();
+        String userId = "u1";
+        String ticketId ="t1";
 
         User user = new User();
         user.setId(userId);
@@ -305,7 +304,7 @@ public class TicketServiceTest {
     @Test
     void getTicketsByUserId_withUnknownUser_throwsResourceNotFoundException() {
         // Arrange : utilisateur absent
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
         when(userRepository.existsById(userId)).thenReturn(false);
 
         // Act & Assert
@@ -319,8 +318,8 @@ public class TicketServiceTest {
     @Test
     void getVisibleTickets_asUser_returnsOnlyOwnTickets() {
         // Arrange : utilisateur avec le rôle USER
-        UUID userId = UUID.randomUUID();
-        UUID ticketId = UUID.randomUUID();
+        String userId = "u1";
+        String ticketId = "t1";
 
         User user = new User();
         user.setId(userId);
@@ -351,17 +350,17 @@ public class TicketServiceTest {
     void getVisibleTickets_asAgent_returnsAllTickets() {
         // Arrange : utilisateur avec le rôle AGENT
         User agent = new User();
-        agent.setId(UUID.randomUUID());
+        agent.setId("u1");
         agent.setEmail("agent@test.com");
         agent.setRole(Role.AGENT);
 
         Ticket t1 = new Ticket();
-        t1.setId(UUID.randomUUID());
+        t1.setId("t1");
         t1.setStatus(TicketStatus.OPEN);
         t1.setCreatedBy(agent);
 
         Ticket t2 = new Ticket();
-        t2.setId(UUID.randomUUID());
+        t2.setId("t2");
         t2.setStatus(TicketStatus.OPEN);
         t2.setCreatedBy(agent);
 
@@ -396,11 +395,11 @@ public class TicketServiceTest {
     @Test
     void assignTicket_withValidTicketAndUser_returnsResponse() {
         // Arrange
-        UUID ticketId = UUID.randomUUID();
-        UUID assigneeId = UUID.randomUUID();
+        String ticketId = "t1";
+        String assigneeId = "u1";
 
         User creator = new User();
-        creator.setId(UUID.randomUUID());
+        creator.setId("u1");
 
         User assignee = new User();
         assignee.setId(assigneeId);
@@ -430,8 +429,8 @@ public class TicketServiceTest {
     @Test
     void assignTicket_withUnknownTicket_throwsResourceNotFoundException() {
         // Arrange : ticket absent
-        UUID ticketId = UUID.randomUUID();
-        UUID assigneeId = UUID.randomUUID();
+        String ticketId = "t1";
+        String assigneeId = "u1";
         when(ticketRepository.findById(ticketId)).thenReturn(Optional.empty());
 
         // Act & Assert
@@ -446,8 +445,8 @@ public class TicketServiceTest {
     @Test
     void assignTicket_withUnknownUser_throwsResourceNotFoundException() {
         // Arrange : ticket présent mais utilisateur absent
-        UUID ticketId = UUID.randomUUID();
-        UUID assigneeId = UUID.randomUUID();
+        String ticketId = "t1";
+        String assigneeId = "u1";
 
         Ticket ticket = new Ticket();
         ticket.setId(ticketId);
@@ -468,7 +467,7 @@ public class TicketServiceTest {
     @Test
     void deleteTicket_withUnknownId_throwsResourceNotFoundException() {
         // Arrange : le ticket n'existe pas
-        UUID ticketId = UUID.randomUUID();
+        String ticketId = "t1";
         when(ticketRepository.existsById(ticketId)).thenReturn(false);
 
         // Act & Assert

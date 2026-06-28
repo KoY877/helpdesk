@@ -1,7 +1,8 @@
 package com.helpdesk.backend.dto;
 
+import jakarta.validation.constraints.NotNull;
 
 public record TicketUpdateRequest(
-    String title,
-    String description
+    @NotNull String title,
+    @NotNull String description
 ) {}

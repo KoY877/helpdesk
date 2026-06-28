@@ -1,9 +1,10 @@
 package com.helpdesk.backend.dto;
 
-import java.util.UUID;
+import io.micrometer.common.lang.NonNull;
 
 public record AuthResponse(
     String token,
+    String refreshToken,
     String role, 
-    UUID userId
+    String userId
 ) {} 

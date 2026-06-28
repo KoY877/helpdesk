@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environement } from '../environements/environements';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
+import { AuthResponse, LoginRequest, RefreshTokenRequest, RegisterRequest } from '../models/auth.model';
 
 /**
  * Handles authentication: calls the auth endpoints and persists the
@@ -16,6 +16,8 @@ export class AuthService {
   private readonly apiUrl = environement.apiUrl;
   // localStorage key under which the JWT is stored
   private readonly TOKEN_KEY = 'token';
+  // localStorage key under which the refresh token is stored
+  private readonly REFRESH_TOKEN_KEY = 'refreshToken';
 
 
 
@@ -44,11 +46,37 @@ export class AuthService {
   }
 
   /**
+   * Exchanges a refresh token for a new access token and refresh token.
+   * @param refreshToken the refresh token currently stored for the session
+   * @returns an Observable emitting the new auth response (token, refreshToken, role, user id)
+   */
+  refresh(refreshToken: string): Observable<AuthResponse> {
+    const request: RefreshTokenRequest = { refreshToken };
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/refresh`, request);
+  }
+
+  /**
    * Persists the JWT in localStorage.
    * @param token the JWT returned by the backend
    */
   saveToken(token: string): void {
     localStorage.setItem('token', token);
+  }
+
+  /**
+   * Persists the refresh token in localStorage.
+   * @param refreshToken the refresh token returned by the backend
+   */
+  saveRefreshToken(refreshToken: string): void {
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+  }
+
+  /**
+   * Reads the stored refresh token.
+   * @returns the refresh token, or null if the user is not logged in
+   */
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
   /**
@@ -120,8 +148,17 @@ export class AuthService {
    * Clears all session data from localStorage, logging the user out.
    */
   logout(): void {
+    const refreshToken = this.getRefreshToken();
+
+    // Best-effort server-side revocation: the local session is cleared regardless of the outcome
+    if (refreshToken) {
+      const request: RefreshTokenRequest = { refreshToken };
+      this.http.post(`${this.apiUrl}/auth/logout`, request).subscribe({ error: () => {} });
+    }
+
     // Remove every piece of session data we persisted at login
     localStorage.removeItem('token');
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem('role');
     localStorage.removeItem('userId');
     localStorage.removeItem('name');

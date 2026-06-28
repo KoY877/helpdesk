@@ -47,8 +47,9 @@ export class LoginComponent {
 
     this.authService.login(this.form.value).subscribe({
       next: (response) => {
-        // Persist token, role and user id for the session
+        // Persist token, refresh token, role and user id for the session
         this.authService.saveToken(response.token);
+        this.authService.saveRefreshToken(response.refreshToken);
         this.authService.saveRole(response.role);
         this.authService.saveUserId(response.userId);
         // Enter the authenticated area

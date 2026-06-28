@@ -19,7 +19,8 @@ import { CommentComponent } from '../comment/comment';
 
 @Component({
   selector: 'app-ticket-board',
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatTableModule, MatIcon, MatPaginator, MatMenuModule, MatInputModule, MatFormFieldModule],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatTableModule, MatIcon,
+    MatPaginator, MatMenuModule, MatInputModule, MatFormFieldModule],
   templateUrl: './ticket-board.html',
   styleUrl: './ticket-board.scss',
 })
@@ -114,7 +115,7 @@ export class TicketBoardComponent {
 
   /** Opens the create-ticket dialog and reloads the list if one was created. */
   openDialog(): void {
-    const dialogRef = this.dialog.open(TicketDialogComponent, { width: '500px' });
+    const dialogRef = this.dialog.open(TicketDialogComponent, { width: '500px', maxWidth: '95vw' });
     dialogRef.afterClosed().subscribe(result => {
       // A truthy result means a ticket was created
       if (result) this.loadTickets();

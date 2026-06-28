@@ -10,7 +10,7 @@ public enum TicketStatus {
         OPEN,        Set.of(IN_PROGRESS),
         IN_PROGRESS, Set.of(RESOLVED),
         RESOLVED,    Set.of(CLOSED),
-        CLOSED,      Set.of( IN_PROGRESS)
+        CLOSED,      Set.of()
     );
 
     public boolean canTransitionTo(TicketStatus next) {

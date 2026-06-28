@@ -8,13 +8,16 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.helpdesk.backend.dto.UserResponse;
 import com.helpdesk.backend.dto.UserRoleUpdateRequest;
@@ -34,6 +37,27 @@ public class UserServiceTest {
     @Mock private JwtService jwtService;
     @InjectMocks private UserService userService;
 
+    /**
+     * Authenticates a distinct admin user in the security context so that
+     * updateRole's "cannot change your own role" guard does not interfere
+     * with tests targeting a different user id.
+     */
+    @BeforeEach
+    void authenticateAsAdmin() {
+        User admin = new User();
+        admin.setId("admin1");
+        admin.setRole(Role.ADMIN);
+
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(admin, null)
+        );
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
     void getAllUsers_withNoUsers_throwsResourceNotFoundException() {
         when(userRepository.findAll()).thenReturn(List.of());
@@ -45,7 +69,7 @@ public class UserServiceTest {
     @Test
     void getAllUsers_returnsListOfUsers() {
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId("u1");
         user.setName("Kodjo");
         user.setEmail("test@test.com");
         user.setRole(Role.USER);
@@ -60,7 +84,7 @@ public class UserServiceTest {
     
     @Test
     void deleteUser_withExistingId_returnUserResponse(){
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
 
         User user = new User();
         user.setId(userId);
@@ -74,7 +98,7 @@ public class UserServiceTest {
 
     @Test
     void deleteUser_withUnknowId_throwsResourceNotFoundException(){
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
         when(userRepository.existsById(userId)).thenReturn(false);
 
         assertThatThrownBy(() ->
@@ -84,7 +108,7 @@ public class UserServiceTest {
 
     @Test
     void updateUser_withExistingId_returnUserResponse() {
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
 
         User user = new User();
         user.setId(userId);
@@ -105,7 +129,7 @@ public class UserServiceTest {
 
     @Test
     void updateUser_withUnknowId_throwsResourceNotFoundException() {
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
@@ -115,7 +139,7 @@ public class UserServiceTest {
 
     @Test
     void updateRole_withExistingId_returnUserResponse() {
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
 
         User user = new User();
         user.setId(userId);
@@ -132,7 +156,7 @@ public class UserServiceTest {
 
     @Test
     void updateRole_withUnknowId_throwsResourceNotFoundException() {
-        UUID userId = UUID.randomUUID();
+        String userId = "u1";
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {

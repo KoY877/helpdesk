@@ -105,7 +105,7 @@ export class UserBoardComponent {
 
   /** Opens the user dialog and reloads the list if it reported a change. */
   openDialog(): void {
-    const dialogRef = this.dialog.open(UserDialogComponent, { width: '500px' });
+    const dialogRef = this.dialog.open(UserDialogComponent, { width: '500px', maxWidth: '95vw' });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadUsers();
     });

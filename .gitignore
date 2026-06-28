@@ -12,6 +12,7 @@ Thumbs.db
 # --- IDE (root-level only; backend/frontend keep their own ignores) ---
 .idea/
 *.iml
+.vscode/
 
 # --- Logs ---
 *.log

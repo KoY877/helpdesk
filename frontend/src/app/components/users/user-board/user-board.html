@@ -22,6 +22,7 @@
 
   <!-- Users table -->
   <div class="tableLayout">
+    <div class="table-scroll">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
       <ng-container matColumnDef="order">
@@ -87,6 +88,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+    </div>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 20]"
                   showFirstLastButtons

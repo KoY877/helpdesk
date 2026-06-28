@@ -11,6 +11,29 @@
       <span class="role">{{ role }}</span>
       <div class="avatar">{{ initials() }}</div>
     </div>
+
+    <button matButton class="btn-hamburger" [matMenuTriggerFor]="menu"><mat-icon>dehaze</mat-icon></button>
+    <mat-menu #menu="matMenu" class="side-items">
+      <div class="user-menu">
+        <span class="role">{{ role }}</span>
+        <div class="avatar">{{ initials() }}</div>
+      </div>
+
+      <button mat-menu-item class="side-item" routerLink="/dashboard" routerLinkActive="active"><mat-icon>dashboard</mat-icon> Dashboard</button>
+      <button mat-menu-item class="side-item" routerLink="/tickets" routerLinkActive="active"><mat-icon>confirmation_number</mat-icon> Tickets</button>
+      <!-- Users management is only visible to admins -->
+      @if (role === 'ADMIN') {
+        <button mat-menu-item class="side-item" routerLink="/users" routerLinkActive="active">
+          <mat-icon>people</mat-icon> Users
+        </button>
+      }
+      <button mat-menu-item class="side-item" routerLink="/settings" routerLinkActive="active">
+        <mat-icon>settings</mat-icon> Settings
+      </button>
+      <button mat-menu-item class="side-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Logout
+      </button>
+    </mat-menu>
   </nav>
 
   <!-- Main layout: fixed side navigation + routed content area -->

@@ -1,12 +1,19 @@
 import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/AuthService';
+
+// Auth endpoints must never be retried through the refresh flow, otherwise a
+// failing login/register/refresh call would try to refresh itself forever
+const isAuthEndpoint = (url: string): boolean =>
+  url.includes('/auth/login') || url.includes('/auth/register') ||
+  url.includes('/auth/refresh') || url.includes('/auth/logout');
 
 /**
  * HTTP interceptor that attaches the JWT to outgoing requests and reacts to
- * authentication errors by logging the user out and redirecting to login.
+ * authentication errors by attempting a token refresh before falling back to
+ * logging the user out and redirecting to login.
  *
  * @param req the outgoing HTTP request
  * @param next the next handler in the interceptor chain
@@ -26,11 +33,33 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
   // Forward the request, intercepting auth failures along the way
   return next(authReq).pipe(
     catchError(err => {
-      // 401/403 means the session is invalid: clear it and send the user to login
+      const refreshToken = authService.getRefreshToken();
+
+      // 401/403 on a normal request with a refresh token available: try to
+      // get a fresh access token and replay the original request once
+      if ((err.status === 401 || err.status === 403) && refreshToken && !isAuthEndpoint(req.url)) {
+        return authService.refresh(refreshToken).pipe(
+          switchMap(response => {
+            authService.saveToken(response.token);
+            authService.saveRefreshToken(response.refreshToken);
+            const retryReq = req.clone({ headers: req.headers.append('Authorization', `Bearer ${response.token}`) });
+            return next(retryReq);
+          }),
+          catchError(refreshErr => {
+            // The refresh token itself is invalid/expired: the session is over
+            authService.logout();
+            router.navigate(['/login']);
+            return throwError(() => refreshErr);
+          })
+        );
+      }
+
+      // No refresh token to try, or the failure came from an auth endpoint itself
       if (err.status === 401 || err.status === 403) {
         authService.logout();
         router.navigate(['/login']);
       }
+      
       // Re-throw so callers can still handle the error
       return throwError(() => err);
     })

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.helpdesk.backend.dto.AuthResponse;
 import com.helpdesk.backend.dto.LoginRequest;
+import com.helpdesk.backend.dto.RefreshTokenRequest;
 import com.helpdesk.backend.dto.UserCreateRequest;
 import com.helpdesk.backend.service.AuthService;
 
@@ -45,4 +46,28 @@ public class AuthController {
         // Delegate to the service and return 200 OK with the token
         return ResponseEntity.ok(authService.login(request));
     }
+
+     /**
+     * Authenticates a user and returns a JWT.
+     *
+     * @param request the login data (email, password)
+     * @return HTTP 200 with an {@link AuthResponse} containing the JWT and user info
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody @Valid RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request.refreshToken()));
+    }
+
+    /**
+     * Logs a user out by revoking their refresh token.
+     *
+     * @param request the refresh token to revoke
+     * @return HTTP 204 with no content
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody @Valid RefreshTokenRequest request) {
+        authService.logout(request.refreshToken());
+        return ResponseEntity.noContent().build();
+    }
+
 }

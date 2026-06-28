@@ -2,6 +2,10 @@ package com.helpdesk.backend.dto;
 
 import com.helpdesk.backend.model.enums.Role;
 
-public record UserRoleUpdateRequest(Role role) {
-    
+import jakarta.validation.constraints.NotNull;
+
+public record UserRoleUpdateRequest(
+    @NotNull Role role
+) {
+
 }

@@ -1,7 +1,6 @@
 package com.helpdesk.backend.model;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -33,7 +32,8 @@ import lombok.Setter;
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(nullable = false, updatable = false)
+    private String id;
 
     @Column(nullable = false)
     private String title;

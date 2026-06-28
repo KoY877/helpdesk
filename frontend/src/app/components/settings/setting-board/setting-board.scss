@@ -62,3 +62,24 @@
     font-weight: 600;
   }
 }
+
+// Below tablet width, shrink the side panel instead of breaking the
+// mat-drawer-container's own layout mechanics.
+@media (max-width: 768px) {
+  .container {
+    .mat-drawer {
+      width: 140px;
+      margin: 12px 0 12px 12px;
+      padding: 6px;
+    }
+
+    .mat-drawer-content {
+      margin-left: 12px;
+    }
+  }
+
+  .side-item {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}

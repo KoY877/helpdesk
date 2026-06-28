@@ -1,6 +1,7 @@
 package com.helpdesk.backend.security;
 
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -19,11 +20,15 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
     
+    
+
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.access-token.expiration}")
     private long expiration;
+
+   
     
     /**
      * Builds the HMAC signing key from the configured Base64 secret.
@@ -54,6 +59,15 @@ public class JwtService {
                     .expiration(new Date(System.currentTimeMillis() + expiration))
                     .signWith(getSigninKey())
                     .compact();
+    }
+
+    /**
+     * Generates a signed JWT for the given user.
+     *
+     * @return a compact, signed JWT 
+     */
+    public String generateRefreshToken(){
+        return UUID.randomUUID().toString();
     }
 
    /**

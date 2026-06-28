@@ -1,7 +1,6 @@
 package com.helpdesk.backend.service;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,7 +55,7 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public void deleteUser(UUID id) {
+    public void deleteUser(String id) {
         // Make sure the user exists before attempting to delete
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User: "+ id);
@@ -75,7 +74,7 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public UserResponse updateUser(UUID id, UserUpdateRequest request) {
+    public UserResponse updateUser(String id, UserUpdateRequest request) {
         // Fetch the existing user or throw if absent
         User user = findOrThrow(id);
 
@@ -98,7 +97,7 @@ public class UserService{
      * @throws ResourceNotFoundException if no user matches the id
      */
     @Transactional
-    public UserResponse updateRole(UUID id, UserRoleUpdateRequest request) {
+    public UserResponse updateRole(String id, UserRoleUpdateRequest request) {
         // Resolve the currently authenticated user from the security context
         User currentUser = (User) SecurityContextHolder.getContext()
                 .getAuthentication()
@@ -126,7 +125,7 @@ public class UserService{
      * @return the matching user as a {@link UserResponse}
      * @throws ResourceNotFoundException if no user matches the id
      */
-    public UserResponse findById(UUID id){
+    public UserResponse findById(String id){
         // Delegate the lookup and map the result to a DTO
         return UserMapper.toResponse(findOrThrow(id));
     }
@@ -138,7 +137,7 @@ public class UserService{
      * @return the matching {@link User} entity
      * @throws ResourceNotFoundException if no user matches the id
      */
-    private User findOrThrow(UUID id){
+    private User findOrThrow(String id){
         // Return the user or raise a not-found exception
         return userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));

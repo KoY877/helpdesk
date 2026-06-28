@@ -1,13 +1,14 @@
 package com.helpdesk.backend.controller;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 
 import com.helpdesk.backend.dto.UserResponse;
 import com.helpdesk.backend.dto.UserRoleUpdateRequest;
@@ -54,7 +55,7 @@ public class UserController {
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id){
+    public ResponseEntity<UserResponse> getUserById(@PathVariable String id){
         // Delegate the lookup to the service
         return ResponseEntity.ok(userService.findById(id));
     }
@@ -68,7 +69,7 @@ public class UserController {
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id, @RequestBody UserUpdateRequest request){
+    public ResponseEntity<UserResponse> updateUser(@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // Delegate the partial update to the service
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
@@ -81,7 +82,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> deleteUser(@PathVariable UUID id){
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable String id){
         // Delete the user then return an empty 204 response
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
@@ -96,7 +97,7 @@ public class UserController {
      */
     @PatchMapping("/admin/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> updateRole(@PathVariable UUID id, @RequestBody UserRoleUpdateRequest request){
+    public ResponseEntity<UserResponse> updateRole(@PathVariable String id, @RequestBody @Valid UserRoleUpdateRequest request){
         // Only admins reach this point; delegate the role change to the service
         return ResponseEntity.ok(userService.updateRole(id, request));
     }

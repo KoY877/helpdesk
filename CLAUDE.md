@@ -39,3 +39,9 @@
   its @param, @return and @throws (including overridden methods, e.g. UserDetails)
 - Comment significant lines inside a method body with // explaining intent
 - Keep comments in English
+
+## Secrets & Sensitive Data
+- Never print, log, cat, or output the contents of .env files in terminal responses
+- Never include actual secret values (JWT_SECRET, DB_PASSWORD) in commit messages, code comments, or documentation
+- When referencing environment variables, use the variable name only (e.g. "JWT_SECRET is configured") — never the actual value
+- If a secret is accidentally exposed (terminal output, screenshot, commit), regenerate it immediately and treat the old value as compromised

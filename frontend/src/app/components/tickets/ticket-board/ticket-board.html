@@ -29,6 +29,7 @@
 
   <!-- Tickets table -->
   <div class="tableLayout">
+    <div class="table-scroll">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
       <ng-container matColumnDef="title">
@@ -80,7 +81,7 @@
                 @if (role === 'ADMIN') {
                   <button mat-stroked-button [matMenuTriggerFor]="assignMenu" class="btn-column btn-action" >
                     <mat-icon>arrow_drop_down</mat-icon>
-                    Assign
+                    <span class="btn-label">Assign</span>
                   </button>
                   <mat-menu #assignMenu="matMenu">
                     <!-- List assignable users; disable the one already assigned -->
@@ -110,15 +111,15 @@
             }
 
             <button mat-flat-button class="btn-column btn-comment" (click)="openDialogComment(ticket)" >
-              <mat-icon>comment</mat-icon>
-              Comment
+              <mat-icon >comment</mat-icon>
+              <div class="btn-label"> Comment </div>
             </button>
 
             <!-- Admins may delete a ticket only while it is still OPEN -->
             @if (role === 'ADMIN' && ticket.status === 'OPEN'){
               <button mat-flat-button class="btn-delete btn-column" aria-label="Delete ticket" (click)="handleDelete(ticket.id)">
                 <mat-icon>delete</mat-icon>
-                Delete
+                <span class="btn-label">Delete</span>
               </button>
             }
 
@@ -129,6 +130,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+    </div>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 20]"
                   showFirstLastButtons

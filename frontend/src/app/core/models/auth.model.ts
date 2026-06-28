@@ -13,9 +13,15 @@ export interface LoginRequest {
   password : string;
 }
 
-/** Response returned by the login/register endpoints. */
+/** Response returned by the login/register/refresh endpoints. */
 export interface AuthResponse {
   token: string;
+  refreshToken: string;
   role: string;
   userId: string;
+}
+
+/** Payload sent to the refresh endpoint. */
+export interface RefreshTokenRequest {
+  refreshToken: string;
 }
