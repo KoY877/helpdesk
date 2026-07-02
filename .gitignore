@@ -14,5 +14,6 @@ Thumbs.db
 *.iml
 .vscode/
 
+
 # --- Logs ---
 *.log
