@@ -23,9 +23,13 @@ class TicketstatusTest {
     }
 
     @Test
-    void closed_cannotTransitionTo_anything() {
+    void closed_canTransitionTo_inProgress() {
+        assertTrue(TicketStatus.CLOSED.canTransitionTo(TicketStatus.IN_PROGRESS));
+    }
+
+    @Test
+    void closed_cannotTransitionTo_others() {
         assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.OPEN));
-        assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.IN_PROGRESS));
         assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.RESOLVED));
         assertFalse(TicketStatus.CLOSED.canTransitionTo(TicketStatus.CLOSED));
     }

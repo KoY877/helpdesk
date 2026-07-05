@@ -72,7 +72,7 @@ cd backend
 # Frontend
 cd frontend
 npm install
-npm start
+npm serve
 ```
 See [backend/Readme.md](backend/Readme.md) and [frontend/README.md](frontend/README.md)
 for service-specific details.
