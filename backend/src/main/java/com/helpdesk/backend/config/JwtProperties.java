@@ -22,7 +22,7 @@ public class JwtProperties {
     /** Access-token configuration. */
     @Data
     public static class AccessToken {
-        private Long expiration = 36000000L; // 15 minutes by default
+        private Long expiration = 36000000L; // 10 Hours by default
 
     }
 

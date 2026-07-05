@@ -114,11 +114,11 @@ public class TicketController {
     }
 
     /**
-     * Partially updates a ticket's title and/or description.
+     * Updates a ticket's title and description.
      * A USER may only update a ticket they created; AGENTs and ADMINs may update any.
      *
      * @param id          the unique identifier of the ticket
-     * @param request     the fields to update
+     * @param request     the new title and description
      * @param userDetails the currently authenticated user
      * @return HTTP 200 with the updated ticket
      */

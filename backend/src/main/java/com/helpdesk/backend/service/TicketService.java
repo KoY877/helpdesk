@@ -153,12 +153,12 @@ public class TicketService {
     }
 
     /**
-     * Partially updates a ticket's title and/or description.
+     * Updates a ticket's title and description.
      * The status is never modified here; use {@link #transition} instead.
      * A USER may only update a ticket they created; AGENTs and ADMINs may update any.
      *
      * @param id          the unique identifier of the ticket
-     * @param request     the fields to update
+     * @param request     the new title and description
      * @param callerEmail the email of the authenticated caller
      * @return the updated ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException if no ticket matches the id
@@ -179,9 +179,9 @@ public class TicketService {
             throw new AccessDeniedException("Access denied");
         }
 
-        // Only overwrite the fields that were provided
-        if (request.title() != null) ticket.setTitle(request.title());
-        if (request.description() != null) ticket.setDescription(request.description());
+        // Both fields are required and validated non-blank by TicketUpdateRequest
+        ticket.setTitle(request.title());
+        ticket.setDescription(request.description());
 
         // Persist and return the updated ticket
         return TicketMapper.toResponse(ticketRepository.save(ticket));
