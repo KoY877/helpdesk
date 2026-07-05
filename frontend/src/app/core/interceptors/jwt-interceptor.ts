@@ -35,9 +35,16 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
     catchError(err => {
       const refreshToken = authService.getRefreshToken();
 
-      // 401/403 on a normal request with a refresh token available: try to
+      // Only a 401 means the access token itself is missing/invalid/expired.
+      // A 403 means the token is fine but the caller lacks permission for this
+      // specific endpoint — that must never trigger a logout/refresh.
+      if (err.status !== 401) {
+        return throwError(() => err);
+      }
+
+      // 401 on a normal request with a refresh token available: try to
       // get a fresh access token and replay the original request once
-      if ((err.status === 401 || err.status === 403) && refreshToken && !isAuthEndpoint(req.url)) {
+      if (refreshToken && !isAuthEndpoint(req.url)) {
         return authService.refresh(refreshToken).pipe(
           switchMap(response => {
             authService.saveToken(response.token);
@@ -55,11 +62,9 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
       }
 
       // No refresh token to try, or the failure came from an auth endpoint itself
-      if (err.status === 401 || err.status === 403) {
-        authService.logout();
-        router.navigate(['/login']);
-      }
-      
+      authService.logout();
+      router.navigate(['/login']);
+
       // Re-throw so callers can still handle the error
       return throwError(() => err);
     })

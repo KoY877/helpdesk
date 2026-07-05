@@ -40,10 +40,12 @@ export class App {
   constructor(
     private cdr : ChangeDetectorRef
   ) {
-    // React to navigation: once on a non-auth page, load the user's initials/role once
+    // React to navigation: on every non-auth page, re-validate that the
+    // authenticated account still exists (e.g. the database was reset while
+    // the app stayed open) and (re)load the user's initials/role.
     effect(() => {
       const url = this.currentUrl();
-      if (!AUTH_ROUTES.includes(url) && !this.initials()) {
+      if (!AUTH_ROUTES.includes(url)) {
         this.loadInitials();
 
         this.role = this.authService.getRole();
@@ -69,7 +71,12 @@ export class App {
   private loadInitials(): void {
     // Nothing to load without a known user id
     const userId = this.authService.getUserId();
-    if (!userId) return;
+    
+    if (!userId) {
+      this.router.navigate(['/login']);
+      return;
+    };
+
     this.userService.getUserById(userId).subscribe({
       next: (user) => {
         // Take the first letter of up to two name parts, uppercased
@@ -78,6 +85,12 @@ export class App {
 
         // Force a change-detection pass since this runs outside Angular's flow
         this.cdr.detectChanges();
+      },
+      error: () => {
+        // The account behind this session no longer exists (e.g. the
+        // database was reset): clear the stale session and go to login.
+        this.authService.logout();
+        this.router.navigate(['/login']);
       }
     });
   }

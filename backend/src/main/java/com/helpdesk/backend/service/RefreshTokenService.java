@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.helpdesk.backend.model.RefreshToken;
 import com.helpdesk.backend.model.User;
@@ -30,7 +31,11 @@ public class RefreshTokenService {
      * @param user the user to issue the refresh token for
      * @return the raw refresh token string to hand back to the client
      */
+    @Transactional
     public String createRefreshToken(User user) {
+        // Revoke all previous tokens before issuing a new one so stolen old tokens can't be reused
+        refreshTokenRepository.deleteByUser(user);
+
         // The token itself is just an opaque random identifier
         String token = jwtService.generateRefreshToken();
 

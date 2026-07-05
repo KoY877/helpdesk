@@ -8,6 +8,8 @@
       - POSTGRES_DB=helpdesk_db
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d helpdesk_db"]
       interval: 5s
@@ -48,3 +50,6 @@
           target: /app/src
         - action: rebuild
           path: ./frontend/package.json
+
+volumes:
+  postgres_data:

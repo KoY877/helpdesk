@@ -64,26 +64,36 @@ public class TicketController {
 
     /**
      * Returns a single ticket by id.
+     * A USER may only retrieve a ticket they created; AGENTs and ADMINs see any.
      *
-     * @param id the unique identifier of the ticket
+     * @param id          the unique identifier of the ticket
+     * @param userDetails the currently authenticated user
      * @return HTTP 200 with the matching ticket
      */
     @GetMapping("/{id}")
-    public ResponseEntity<TicketResponse> getTicketById(@PathVariable @NotNull String id) {
-        // Delegate the lookup to the service
-        return ResponseEntity.ok(ticketService.getTicketById(id));
+    @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
+    public ResponseEntity<TicketResponse> getTicketById(
+            @PathVariable @NotNull String id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        // Pass the caller's identity so the service can enforce ownership
+        return ResponseEntity.ok(ticketService.getTicketById(id, userDetails.getUsername()));
     }
 
     /**
      * Returns the tickets created by a given user.
+     * A USER may only query their own id; AGENTs and ADMINs may query any user.
      *
-     * @param userId the unique identifier of the author
+     * @param userId      the unique identifier of the author
+     * @param userDetails the currently authenticated user
      * @return HTTP 200 with the list of tickets created by the user
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TicketResponse>> getTicketsByUserId(@PathVariable @NotNull String userId) {
-        // Delegate the lookup to the service
-        return ResponseEntity.ok(ticketService.getTicketsByUserId(userId));
+    @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
+    public ResponseEntity<List<TicketResponse>> getTicketsByUserId(
+            @PathVariable @NotNull String userId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        // Pass the caller's identity so the service can enforce ownership
+        return ResponseEntity.ok(ticketService.getTicketsByUserId(userId, userDetails.getUsername()));
     }
 
     /**
@@ -105,17 +115,21 @@ public class TicketController {
 
     /**
      * Partially updates a ticket's title and/or description.
+     * A USER may only update a ticket they created; AGENTs and ADMINs may update any.
      *
-     * @param id      the unique identifier of the ticket
-     * @param request the fields to update
+     * @param id          the unique identifier of the ticket
+     * @param request     the fields to update
+     * @param userDetails the currently authenticated user
      * @return HTTP 200 with the updated ticket
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<TicketResponse> updateTicket(
             @PathVariable @NotNull String id,
-            @RequestBody @Valid TicketUpdateRequest request) {
-        // Delegate the update to the service
-        return ResponseEntity.ok(ticketService.updateTicket(id, request));
+            @RequestBody @Valid TicketUpdateRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        // Pass the caller's identity so the service can enforce ownership
+        return ResponseEntity.ok(ticketService.updateTicket(id, request, userDetails.getUsername()));
     }
 
     /**
@@ -154,12 +168,13 @@ public class TicketController {
     }
 
     /**
-     * Deletes a ticket by id.
+     * Deletes a ticket by id. Restricted to administrators.
      *
      * @param id the unique identifier of the ticket
      * @return HTTP 204 with no content
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTicket(@PathVariable @NotNull String id) {
         // Delete the ticket then return an empty 204 response
         ticketService.deleteTicket(id);

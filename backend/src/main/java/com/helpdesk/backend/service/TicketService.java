@@ -11,6 +11,7 @@ import com.helpdesk.backend.dto.TicketCreateRequest;
 import com.helpdesk.backend.dto.TicketMapper;
 import com.helpdesk.backend.dto.TicketResponse;
 import com.helpdesk.backend.dto.TicketUpdateRequest;
+import com.helpdesk.backend.exception.InvalidAssigneeException;
 import com.helpdesk.backend.exception.InvalidTransitionException;
 import com.helpdesk.backend.exception.ResourceNotFoundException;
 import com.helpdesk.backend.model.Ticket;
@@ -45,34 +46,60 @@ public class TicketService {
     }
 
     /**
-     * Retrieves a single ticket by id.
+     * Retrieves a single ticket by id, enforcing visibility: a USER may only
+     * read a ticket they created; AGENTs and ADMINs may read any ticket.
      *
-     * @param id the unique identifier of the ticket
+     * @param id          the unique identifier of the ticket
+     * @param callerEmail the email of the authenticated caller
      * @return the matching ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException if no ticket matches the id
+     * @throws AccessDeniedException     if a USER tries to read a ticket they do not own
      */
     @Transactional
-    public TicketResponse getTicketById(@NotNull String id) {
-        // Find the ticket, map it, or throw if it is missing
-        return ticketRepository.findById(id).map(TicketMapper::toResponse)
+    public TicketResponse getTicketById(@NotNull String id, @NotNull String callerEmail) {
+        // Find the ticket or throw if missing
+        Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
+
+        // Resolve the caller so we can check their role and ownership
+        User caller = userRepository.findByEmail(callerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // A plain USER may only view tickets they created
+        if (caller.getRole() == Role.USER && !ticket.getCreatedBy().getId().equals(caller.getId())) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        return TicketMapper.toResponse(ticket);
     }
 
     /**
-     * Retrieves the tickets created by a given user.
+     * Retrieves the tickets created by a given user, enforcing visibility: a USER
+     * may only query their own id; AGENTs and ADMINs may query any user.
      *
-     * @param userId the unique identifier of the author
+     * @param userId      the unique identifier of the author
+     * @param callerEmail the email of the authenticated caller
      * @return the list of tickets created by the user
-     * @throws ResourceNotFoundException if the user does not exist
+     * @throws ResourceNotFoundException if the target user does not exist
+     * @throws AccessDeniedException     if a USER tries to list another user's tickets
      */
     @Transactional
-    public List<TicketResponse> getTicketsByUserId(@NotNull String userId) {
-        // Make sure the user exists before querying their tickets
-        if (!userRepository.existsById(userId)) {
+    public List<TicketResponse> getTicketsByUserId(@NotNull String userId, @NotNull String callerEmail) {
+        // Resolve the caller to check their role
+        User caller = userRepository.findByEmail(callerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // A plain USER may only list their own tickets
+        if (caller.getRole() == Role.USER && !caller.getId().equals(userId)) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        // For AGENT/ADMIN querying a different user, verify the target exists
+        if (!caller.getId().equals(userId) && !userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User not found: " + userId);
         }
 
-        // Fetch the tickets authored by the user and map them
+        // Fetch the tickets authored by the target user and map them
         return ticketRepository.findByCreatedBy_Id(userId).stream()
                 .map(TicketMapper::toResponse).toList();
     }
@@ -93,7 +120,7 @@ public class TicketService {
 
         // A plain USER only sees their own tickets; AGENT/ADMIN see everything
         return user.getRole() == Role.USER
-                ? getTicketsByUserId(user.getId())
+                ? getTicketsByUserId(user.getId(), email)
                 : getAllTickets();
     }
 
@@ -128,17 +155,29 @@ public class TicketService {
     /**
      * Partially updates a ticket's title and/or description.
      * The status is never modified here; use {@link #transition} instead.
+     * A USER may only update a ticket they created; AGENTs and ADMINs may update any.
      *
-     * @param id      the unique identifier of the ticket
-     * @param request the fields to update
+     * @param id          the unique identifier of the ticket
+     * @param request     the fields to update
+     * @param callerEmail the email of the authenticated caller
      * @return the updated ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException if no ticket matches the id
+     * @throws AccessDeniedException     if a USER tries to update a ticket they do not own
      */
     @Transactional
-    public TicketResponse updateTicket(@NotNull String id, TicketUpdateRequest request) {
+    public TicketResponse updateTicket(@NotNull String id, TicketUpdateRequest request, @NotNull String callerEmail) {
         // Fetch the ticket or throw if it is missing
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
+
+        // Resolve the caller to check their role and ownership
+        User caller = userRepository.findByEmail(callerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // A plain USER may only edit their own ticket
+        if (caller.getRole() == Role.USER && !ticket.getCreatedBy().getId().equals(caller.getId())) {
+            throw new AccessDeniedException("Access denied");
+        }
 
         // Only overwrite the fields that were provided
         if (request.title() != null) ticket.setTitle(request.title());
@@ -150,12 +189,14 @@ public class TicketService {
 
     /**
      * Assigns a ticket to an agent and moves it to IN_PROGRESS.
+     * The assignee must hold the AGENT or ADMIN role; assigning to a plain USER is rejected.
      *
      * @param ticketId     the unique identifier of the ticket
      * @param assignedToId the unique identifier of the assignee
      * @return the updated ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException  if the ticket or the assignee does not exist
      * @throws InvalidTransitionException if the ticket cannot move to IN_PROGRESS
+     * @throws InvalidAssigneeException   if the assignee does not have the AGENT or ADMIN role
      */
     @Transactional
     public TicketResponse assignTicket(@NotNull String ticketId, @NotNull String assignedToId) {
@@ -172,6 +213,12 @@ public class TicketService {
         // Resolve the assignee or throw if it is missing
         User assignedTo = userRepository.findById(assignedToId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + assignedToId));
+
+        // Only AGENTs and ADMINs may handle tickets; reject plain USERs to prevent inconsistent state
+        if (assignedTo.getRole() == Role.USER) {
+            throw new InvalidAssigneeException(
+                "User id: " + assignedToId + " does not have the required role to be assigned a ticket");
+        }
 
         // Apply the assignment and advance the status
         ticket.setAssignedTo(assignedTo);

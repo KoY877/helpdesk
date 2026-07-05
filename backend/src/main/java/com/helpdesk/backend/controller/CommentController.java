@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
+
 import com.helpdesk.backend.dto.CommentCreateRequest;
 import com.helpdesk.backend.dto.CommentResponse;
 import com.helpdesk.backend.service.CommentService;
@@ -27,21 +29,25 @@ import jakarta.validation.Valid;
 @AllArgsConstructor
 @Validated
 public class CommentController {
+    
     private final CommentService commentService;
 
     /**
      * Lists every comment attached to a ticket, oldest first.
+     * A USER may only read comments on a ticket they created; AGENTs and ADMINs see any.
      *
-     * @param ticketId the unique identifier of the ticket
+     * @param ticketId    the unique identifier of the ticket
+     * @param userDetails the currently authenticated user
      * @return HTTP 200 with the ticket's comments
      */
     @GetMapping("/api/tickets/{ticketId}/comments")
     @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<List<CommentResponse>> getTicketComments(
-        @PathVariable String ticketId) {
+        @PathVariable String ticketId,
+        @AuthenticationPrincipal UserDetails userDetails) {
 
-        // Delegate to the service which validates the ticket and maps the comments
-        return ResponseEntity.ok(commentService.getCommentsByTicket(ticketId));
+        // Pass the caller's identity so the service can enforce ownership
+        return ResponseEntity.ok(commentService.getCommentsByTicket(ticketId, userDetails.getUsername()));
     }
 
     /**

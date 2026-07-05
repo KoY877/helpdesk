@@ -97,6 +97,7 @@
   .table-header{
     font-weight: 700;
     font-size: 20px;
+    white-space: nowrap;
   }
 
   .title {
@@ -113,7 +114,7 @@
 
 table {
   width: 100%;
-  min-width: 800px;
+  min-width: 900px;
 
   .mdc-data-table__row:last-child > .mat-mdc-cell{
     border-bottom: none;
@@ -122,10 +123,12 @@ table {
 
   // Distribute the columns across the full table width with proportional
   // widths (they sum to 100%) instead of letting them shrink to content.
-  .mat-column-title      { width: 24%; }
-  .mat-column-status     { width: 11%; }
-  .mat-column-assignedTo { width: 12%; }
-  .mat-column-createdBy  { width: 12%; }
+  // Widths for the two-word headers (Assigned To / Created by) are sized
+  // generously enough that the nowrap title above never gets clipped.
+  .mat-column-title      { width: 22%; }
+  .mat-column-status     { width: 10%; }
+  .mat-column-assignedTo { width: 14%; }
+  .mat-column-createdBy  { width: 13%; }
   .mat-column-createdAt  { width: 13%; }
   .mat-column-Actions    { width: 28%; }
 }

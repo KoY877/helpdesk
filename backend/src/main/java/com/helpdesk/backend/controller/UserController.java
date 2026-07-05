@@ -41,7 +41,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing a list of all {@link User} objects
      */
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         // Delegate to the service and return the full list of users
         return ResponseEntity.ok(userService.getAllUsers());
@@ -49,12 +49,13 @@ public class UserController {
 
     /**
      * Get an existing user's data.
+     * Access is restricted at the HTTP level to the owner of the account or an ADMIN;
+     * no method-level annotation is needed here.
      *
-     * @param id      the unique identifier of the user to update
-     * @return a {@link ResponseEntity} containing the user data {@link UserResponse} 
+     * @param id the unique identifier of the user to retrieve
+     * @return a {@link ResponseEntity} containing the user data {@link UserResponse}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'AGENT', 'ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable String id){
         // Delegate the lookup to the service
         return ResponseEntity.ok(userService.findById(id));

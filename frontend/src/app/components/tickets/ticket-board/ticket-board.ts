@@ -84,13 +84,13 @@ export class TicketBoardComponent {
     private dialog: MatDialog,
   ) {}
 
-  /** Lifecycle hook: load role, tickets and (for agents/admins) assignable users. */
+  /** Lifecycle hook: load role, tickets and (for admins) assignable users. */
   ngOnInit(): void {
     this.role = this.authService.getRole();
     this.loadTickets();
 
-    // Only privileged roles need the list of possible assignees
-    if (this.role === 'AGENT' || this.role === 'ADMIN') {
+    // Only admins can assign tickets (GET /users/all is admin-only server-side)
+    if (this.role === 'ADMIN') {
       this.loadAssignableUsers();
     }
   }
