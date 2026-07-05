@@ -39,7 +39,7 @@ public class UserController {
      * Retrieves all users in the system.
      *
      * @return a {@link ResponseEntity} containing a list of all {@link User} objects
-     */
+    */
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {

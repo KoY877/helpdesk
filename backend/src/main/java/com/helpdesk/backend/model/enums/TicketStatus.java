@@ -10,7 +10,8 @@ public enum TicketStatus {
         OPEN,        Set.of(IN_PROGRESS),
         IN_PROGRESS, Set.of(RESOLVED),
         RESOLVED,    Set.of(CLOSED),
-        CLOSED,      Set.of()
+        // A closed ticket can be reopened, sending it back into progress
+        CLOSED,      Set.of(IN_PROGRESS)
     );
 
     public boolean canTransitionTo(TicketStatus next) {

@@ -106,7 +106,9 @@
                 }
               }
               @case ('CLOSED') {
-                <button mat-stroked-button (click)="handleTransition(ticket.id, 'IN_PROGRESS')" class="btn-column btn-action">Reopen</button>
+                @if (role === 'AGENT' || role === 'ADMIN') {
+                  <button mat-stroked-button (click)="handleTransition(ticket.id, 'IN_PROGRESS')" class="btn-column btn-action">Reopen</button>
+                }
               }
             }
 

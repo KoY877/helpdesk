@@ -1,7 +1,7 @@
 import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, throwError, Observable, of, finalize, shareReplay } from 'rxjs';
 import { AuthService } from '../services/AuthService';
 
 // Auth endpoints must never be retried through the refresh flow, otherwise a
@@ -9,6 +9,12 @@ import { AuthService } from '../services/AuthService';
 const isAuthEndpoint = (url: string): boolean =>
   url.includes('/auth/login') || url.includes('/auth/register') ||
   url.includes('/auth/refresh') || url.includes('/auth/logout');
+
+// Shared in-flight refresh call. Without this, two requests failing with 401
+// at the same time (e.g. two components loading data on the same navigation)
+// would each start their own refresh; the first rotates the refresh token,
+// so the second one's refresh always fails and wrongly logs the user out.
+let refreshInProgress$: Observable<string> | null = null;
 
 /**
  * HTTP interceptor that attaches the JWT to outgoing requests and reacts to
@@ -45,18 +51,32 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
       // 401 on a normal request with a refresh token available: try to
       // get a fresh access token and replay the original request once
       if (refreshToken && !isAuthEndpoint(req.url)) {
-        return authService.refresh(refreshToken).pipe(
-          switchMap(response => {
-            authService.saveToken(response.token);
-            authService.saveRefreshToken(response.refreshToken);
-            const retryReq = req.clone({ headers: req.headers.append('Authorization', `Bearer ${response.token}`) });
+        // Reuse an already-running refresh instead of starting a competing
+        // one that would race against it and fail once the token rotates
+        if (!refreshInProgress$) {
+          refreshInProgress$ = authService.refresh(refreshToken).pipe(
+            switchMap(response => {
+              authService.saveToken(response.token);
+              authService.saveRefreshToken(response.refreshToken);
+              return of(response.token);
+            }),
+            catchError(refreshErr => {
+              // The refresh token itself is invalid/expired: the session is over
+              authService.logout();
+              router.navigate(['/login']);
+              return throwError(() => refreshErr);
+            }),
+            // Let the next 401 start a fresh refresh once this one settles
+            finalize(() => { refreshInProgress$ = null; }),
+            // Multicast the single HTTP call to every concurrent 401
+            shareReplay(1)
+          );
+        }
+
+        return refreshInProgress$.pipe(
+          switchMap(newToken => {
+            const retryReq = req.clone({ headers: req.headers.set('Authorization', `Bearer ${newToken}`) });
             return next(retryReq);
-          }),
-          catchError(refreshErr => {
-            // The refresh token itself is invalid/expired: the session is over
-            authService.logout();
-            router.navigate(['/login']);
-            return throwError(() => refreshErr);
           })
         );
       }
