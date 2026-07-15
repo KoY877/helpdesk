@@ -1,5 +1,5 @@
 /** Production environment settings: backend API base URL. */
 export const environement = {
     production: true,
-    apiUrl: "http://localhost:8081/api"
+    apiUrl: "https://api.koy877.dev/api"
 }
