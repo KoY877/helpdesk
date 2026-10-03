@@ -25,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.helpdesk.backend.repository.CommentRepository commentRepository;
+    private final com.helpdesk.backend.repository.TicketRepository ticketRepository;
+    private final com.helpdesk.backend.repository.RefreshTokenRepository refreshTokenRepository;
 
     
 
@@ -61,6 +64,12 @@ public class UserService{
             throw new ResourceNotFoundException("User: "+ id);
         }
 
+        // Respecte les clés étrangères : supprime les dépendances avant le compte.
+        // La transaction annule l'ensemble des opérations si l'une d'elles échoue.
+        refreshTokenRepository.deleteForUser(id);
+        commentRepository.deleteForAccount(id);
+        ticketRepository.unassignUser(id);
+        ticketRepository.deleteCreatedByUser(id);
         // Remove the user from the database
         userRepository.deleteById(id);
     }

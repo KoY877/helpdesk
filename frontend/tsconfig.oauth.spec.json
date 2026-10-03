@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "include": ["src/app/app.oauth.spec.ts", "src/app/oauth-flow.spec.ts", "src/**/*.d.ts"]
+}

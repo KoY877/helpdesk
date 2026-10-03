@@ -35,6 +35,9 @@ public class UserServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private JwtService jwtService;
+    @Mock private com.helpdesk.backend.repository.CommentRepository commentRepository;
+    @Mock private com.helpdesk.backend.repository.TicketRepository ticketRepository;
+    @Mock private com.helpdesk.backend.repository.RefreshTokenRepository refreshTokenRepository;
     @InjectMocks private UserService userService;
 
     /**
@@ -94,6 +97,13 @@ public class UserServiceTest {
         userService.deleteUser(userId);
 
         verify(userRepository).deleteById(userId);
+        var deletionOrder = org.mockito.Mockito.inOrder(refreshTokenRepository, commentRepository,
+                ticketRepository, userRepository);
+        deletionOrder.verify(refreshTokenRepository).deleteForUser(userId);
+        deletionOrder.verify(commentRepository).deleteForAccount(userId);
+        deletionOrder.verify(ticketRepository).unassignUser(userId);
+        deletionOrder.verify(ticketRepository).deleteCreatedByUser(userId);
+        deletionOrder.verify(userRepository).deleteById(userId);
     }
 
     @Test

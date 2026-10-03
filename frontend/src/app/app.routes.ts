@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { OAuthCallbackComponent } from './components/login/oauth-callback';
 import { authGuard } from './core/guards/auth-guard';
 import { LoginComponent } from './components/login/login/login';
 import { DashboardComponent } from './components/dashboard/dashboard';
@@ -14,6 +15,7 @@ import { PasswordComponent } from './components/settings/password/password';
  * feature route is protected by {@link authGuard}.
  */
 export const routes: Routes = [
+  {path:'oauth/callback', component: OAuthCallbackComponent},
   // Public authentication routes
   {path:'register', component: RegisterComponent},
   {path:'login', component: LoginComponent},

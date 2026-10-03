@@ -53,7 +53,8 @@ public class TicketService {
      * @param callerEmail the email of the authenticated caller
      * @return the matching ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException if no ticket matches the id
-     * @throws AccessDeniedException     if a USER tries to read a ticket they do not own
+     * @throws AccessDeniedException     if a USER tries to read a ticket they do
+     *                                   not own
      */
     @Transactional
     public TicketResponse getTicketById(@NotNull String id, @NotNull String callerEmail) {
@@ -81,7 +82,8 @@ public class TicketService {
      * @param callerEmail the email of the authenticated caller
      * @return the list of tickets created by the user
      * @throws ResourceNotFoundException if the target user does not exist
-     * @throws AccessDeniedException     if a USER tries to list another user's tickets
+     * @throws AccessDeniedException     if a USER tries to list another user's
+     *                                   tickets
      */
     @Transactional
     public List<TicketResponse> getTicketsByUserId(@NotNull String userId, @NotNull String callerEmail) {
@@ -155,14 +157,16 @@ public class TicketService {
     /**
      * Updates a ticket's title and description.
      * The status is never modified here; use {@link #transition} instead.
-     * A USER may only update a ticket they created; AGENTs and ADMINs may update any.
+     * A USER may only update a ticket they created; AGENTs and ADMINs may update
+     * any.
      *
      * @param id          the unique identifier of the ticket
      * @param request     the new title and description
      * @param callerEmail the email of the authenticated caller
      * @return the updated ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException if no ticket matches the id
-     * @throws AccessDeniedException     if a USER tries to update a ticket they do not own
+     * @throws AccessDeniedException     if a USER tries to update a ticket they do
+     *                                   not own
      */
     @Transactional
     public TicketResponse updateTicket(@NotNull String id, TicketUpdateRequest request, @NotNull String callerEmail) {
@@ -189,14 +193,17 @@ public class TicketService {
 
     /**
      * Assigns a ticket to an agent and moves it to IN_PROGRESS.
-     * The assignee must hold the AGENT or ADMIN role; assigning to a plain USER is rejected.
+     * The assignee must hold the AGENT or ADMIN role; assigning to a plain USER is
+     * rejected.
      *
      * @param ticketId     the unique identifier of the ticket
      * @param assignedToId the unique identifier of the assignee
      * @return the updated ticket as a {@link TicketResponse}
-     * @throws ResourceNotFoundException  if the ticket or the assignee does not exist
+     * @throws ResourceNotFoundException  if the ticket or the assignee does not
+     *                                    exist
      * @throws InvalidTransitionException if the ticket cannot move to IN_PROGRESS
-     * @throws InvalidAssigneeException   if the assignee does not have the AGENT or ADMIN role
+     * @throws InvalidAssigneeException   if the assignee does not have the AGENT or
+     *                                    ADMIN role
      */
     @Transactional
     public TicketResponse assignTicket(@NotNull String ticketId, @NotNull String assignedToId) {
@@ -207,17 +214,18 @@ public class TicketService {
         // Assigning implies moving to IN_PROGRESS, so validate that transition first
         if (!ticket.getStatus().canTransitionTo(TicketStatus.IN_PROGRESS)) {
             throw new InvalidTransitionException(
-                "Cannot assign ticket in status " + ticket.getStatus());
+                    "Cannot assign ticket in status " + ticket.getStatus());
         }
 
         // Resolve the assignee or throw if it is missing
         User assignedTo = userRepository.findById(assignedToId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + assignedToId));
 
-        // Only AGENTs and ADMINs may handle tickets; reject plain USERs to prevent inconsistent state
+        // Only AGENTs and ADMINs may handle tickets; reject plain USERs to prevent
+        // inconsistent state
         if (assignedTo.getRole() == Role.USER) {
             throw new InvalidAssigneeException(
-                "User id: " + assignedToId + " does not have the required role to be assigned a ticket");
+                    "User id: " + assignedToId + " does not have the required role to be assigned a ticket");
         }
 
         // Apply the assignment and advance the status
@@ -258,8 +266,10 @@ public class TicketService {
      * @param userEmail    the email of the user requesting the transition
      * @return the updated ticket as a {@link TicketResponse}
      * @throws ResourceNotFoundException  if the ticket or the user does not exist
-     * @throws AccessDeniedException      if the user is not allowed to perform the transition
-     * @throws InvalidTransitionException if the transition is not allowed by the state machine
+     * @throws AccessDeniedException      if the user is not allowed to perform the
+     *                                    transition
+     * @throws InvalidTransitionException if the transition is not allowed by the
+     *                                    state machine
      */
     @Transactional
     public TicketResponse transition(@NotNull String id, TicketStatus targetStatus, String userEmail) {
@@ -268,7 +278,8 @@ public class TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
 
         // Resolve the requesting user from their email
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("User not found "));
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found "));
 
         // Determine whether the user owns the ticket
         boolean isCreator = ticket.getCreatedBy().getId().equals(user.getId());

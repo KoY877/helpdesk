@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -68,39 +69,59 @@ public class SecurityConfig {
      * @throws Exception if the configuration fails
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+            com.helpdesk.backend.security.GithubSuccessHandler githubSuccessHandler) throws Exception {
         http
-            // Enable CORS using the source defined above
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // CSRF protection is unnecessary for a stateless token-based API
-            .csrf(AbstractHttpConfigurer::disable)
-            // Never create an HTTP session; every request is authenticated by its token
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authz -> authz
-                // Authentication endpoints are public
-                .requestMatchers("/api/auth/**").permitAll()
-                // Let Spring Boot's error forward render the real status/body instead of
-                // being rejected by this filter chain and masked as a generic 401
-                .requestMatchers("/error").permitAll()
-                // Listing all users is reserved to agents and admins
-                .requestMatchers(HttpMethod.GET, "/api/users/all").hasAnyRole("AGENT", "ADMIN")
-                // Listing all tickets is reserved to agents and admins
-                .requestMatchers(HttpMethod.GET, "/api/tickets/all").hasAnyRole("AGENT", "ADMIN")
-                // Reading a single user is allowed to its owner or an admin
-                .requestMatchers(HttpMethod.GET, "/api/users/{id}").access(ownerOrAdmin())
-                // Everything else simply requires authentication
-                .anyRequest().authenticated()
-            )
-            .exceptionHandling(ex -> ex
-                // Return a JSON 401 body instead of the default HTML error page
-                .authenticationEntryPoint((req, res, e) -> {
-                    res.setStatus(401);
-                    res.setContentType("application/json");
-                    res.getWriter().write("{\"error\":\"Unauthorized\"}");
-                })
-            )
-            // Run the JWT filter before the standard username/password filter
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // Enable CORS using the source defined above
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // CSRF protection is unnecessary for a stateless token-based API
+                .csrf(AbstractHttpConfigurer::disable)
+                // Never create an HTTP session; every request is authenticated by its token
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
+                        // Authentication endpoints are public
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Let Spring Boot's error forward render the real status/body instead of
+                        // being rejected by this filter chain and masked as a generic 401
+                        .requestMatchers("/error").permitAll()
+                        // Listing all users is reserved to agents and admins
+                        .requestMatchers(HttpMethod.GET, "/api/users/all").hasAnyRole("AGENT", "ADMIN")
+                        // Listing all tickets is reserved to agents and admins
+                        .requestMatchers(HttpMethod.GET, "/api/tickets/all").hasAnyRole("AGENT", "ADMIN")
+                        // Reading a single user is allowed to its owner or an admin
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").access(ownerOrAdmin())
+                        // Everything else simply requires authentication
+                        .anyRequest().authenticated())
+                .oauth2Login((oauth2) -> oauth2
+                    .successHandler(githubSuccessHandler)
+                    .loginPage("/login")        
+                    .authorizationEndpoint((authorization) -> authorization
+                        .baseUri("/login/oauth2/authorization"))
+                    // Report the OAuth failure directly: redirecting to a protected
+                    // login page hides the original cause behind a second 401.
+                    .failureHandler((request, response, exception) -> {
+                        String code = exception instanceof OAuth2AuthenticationException oauthError
+                                ? oauthError.getError().getErrorCode()
+                                : "authentication_failed";
+                        // Only expose a bounded error identifier, never provider details or tokens.
+                        if (code == null || !code.matches("[a-zA-Z0-9_]{1,80}")) {
+                            code = "authentication_failed";
+                        }
+                        response.setStatus(401);
+                        response.setContentType("application/json");
+                        response.setHeader("Cache-Control", "no-store");
+                        response.getWriter().write("{\"error\":\"github_login_failed\",\"code\":\"" + code + "\"}");
+                    })
+                )
+                .exceptionHandling(ex -> ex
+                        // Return a JSON 401 body instead of the default HTML error page
+                        .authenticationEntryPoint((req, res, e) -> {
+                            res.setStatus(401);
+                            res.setContentType("application/json");
+                            res.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        }))
+                // Run the JWT filter before the standard username/password filter
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -116,7 +137,8 @@ public class SecurityConfig {
             // Admins are always allowed
             boolean isAdmin = principal.get().getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            if (isAdmin) return new AuthorizationDecision(true);
+            if (isAdmin)
+                return new AuthorizationDecision(true);
 
             // A non-admin must present a Bearer token to be checked for ownership
             String header = ctx.getRequest().getHeader("Authorization");

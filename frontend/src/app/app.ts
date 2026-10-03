@@ -11,7 +11,8 @@ import { UserService } from './core/services/UserService';
 import { MatMenu, MatMenuModule, MatMenuTrigger } from "@angular/material/menu";
 
 // Routes on which the app shell (sidenav, header) must be hidden
-const AUTH_ROUTES = ['/login', '/register'];
+const AUTH_ROUTES = ['/login', '/register', '/oauth/callback'];
+const isAuthRoute = (url: string) => AUTH_ROUTES.includes(url.split(/[?#]/)[0]);
 
 @Component({
   selector: 'app-root',
@@ -45,7 +46,7 @@ export class App {
     // the app stayed open) and (re)load the user's initials/role.
     effect(() => {
       const url = this.currentUrl();
-      if (!AUTH_ROUTES.includes(url)) {
+      if (!isAuthRoute(url) && this.authService.isAuthenticated()) {
         this.loadInitials();
 
         this.role = this.authService.getRole();
@@ -63,7 +64,7 @@ export class App {
   );
 
   // Show the app shell everywhere except on the auth pages
-  showShell = computed(() => !AUTH_ROUTES.includes(this.currentUrl()));
+  showShell = computed(() => !isAuthRoute(this.currentUrl()));
 
   /**
    * Loads the authenticated user and derives their two-letter initials.

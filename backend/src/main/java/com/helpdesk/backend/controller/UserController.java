@@ -69,7 +69,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing the updated {@link UserResponse}
      */
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #p0 == authentication.principal.id")
     public ResponseEntity<UserResponse> updateUser(@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // Delegate the partial update to the service
         return ResponseEntity.ok(userService.updateUser(id, request));
@@ -82,7 +82,7 @@ public class UserController {
      * @return a {@link ResponseEntity} with HTTP 204 and no content
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or #p0 == authentication.principal.id")
     public ResponseEntity<UserResponse> deleteUser(@PathVariable String id){
         // Delete the user then return an empty 204 response
         userService.deleteUser(id);

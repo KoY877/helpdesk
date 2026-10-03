@@ -10,6 +10,7 @@ import com.helpdesk.backend.model.User;
 
 
 public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByGithubId(String githubId);
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
 

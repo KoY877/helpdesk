@@ -26,6 +26,8 @@ let refreshInProgress$: Observable<string> | null = null;
  * @returns the (possibly modified) request stream
  */
 export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+  // OAuth exchanges use their session-bound code, and display their own failures.
+  if (req.url.includes('/auth/oauth/exchange')) return next(req);
   // Resolve the dependencies via Angular's functional injection
   const authService = inject(AuthService);
   const router = inject(Router);

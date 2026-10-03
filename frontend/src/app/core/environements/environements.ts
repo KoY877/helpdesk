@@ -1,5 +1,5 @@
 /** Default (development) environment settings: backend API base URL. */
 export const environement = {
-  production: false,
+  production: true,
   apiUrl: "http://localhost:8081/api"
 }

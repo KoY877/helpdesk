@@ -1,17 +1,18 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/AuthService';
+import { environement } from '../../../core/environements/environements';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
-import { MatRow } from "@angular/material/table";
+import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatCardModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatCardModule, MatButtonModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -20,6 +21,8 @@ import { MatRow } from "@angular/material/table";
  * session data and navigates to the dashboard.
  */
 export class LoginComponent {
+
+  readonly githubLoginUrl = `${environement.apiUrl.replace(/\/api\/?$/, '')}/login/oauth2/authorization/github`;
 
   // Reactive form holding the email/password fields
   form : FormGroup;

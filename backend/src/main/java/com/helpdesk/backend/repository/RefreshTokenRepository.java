@@ -18,6 +18,10 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Stri
     @Transactional
     void deleteByUser(User user);
 
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("delete from RefreshToken r where r.user.id = :id")
+    void deleteForUser(@org.springframework.data.repository.query.Param("id") String id);
+
     @Modifying
     @Transactional
     int deleteByExpiryDateBefore(LocalDateTime date);

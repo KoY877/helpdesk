@@ -32,6 +32,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+    @Column(unique = true)
+    private String githubId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

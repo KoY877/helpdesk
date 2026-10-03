@@ -22,6 +22,24 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
+    private final com.helpdesk.backend.security.OAuthHandoff oauthHandoff;
+
+    /** Code temporaire envoyé par Angular après le retour de GitHub. */
+    public record OAuthExchangeRequest(String code) {}
+
+    /**
+     * Échange le code OAuth temporaire contre les jetons du compte local.
+     * @param body code reçu dans le fragment de l'URL de retour
+     * @param request requête portant le cookie de la session OAuth
+     * @return jetons et informations du compte, avec mise en cache interdite
+     */
+    @PostMapping("/oauth/exchange")
+    public ResponseEntity<AuthResponse> exchange(@RequestBody OAuthExchangeRequest body,
+            jakarta.servlet.http.HttpServletRequest request) {
+        // getSession(false) exige une session existante sans en créer une nouvelle.
+        return ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(oauthHandoff.exchange(request.getSession(false), body.code()));
+    }
 
     /**
      * Registers a new user account.

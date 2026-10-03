@@ -19,7 +19,8 @@ public class CorsProperties {
     // HTTP methods the front-end is allowed to use
     private List<String> allowedMethods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
     // Request headers the front-end is allowed to send
-    private List<String> allowedHeaders = List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With");
+    private List<String> allowedHeaders = List.of("Authorization", "Content-Type", "Accept", "Origin",
+            "X-Requested-With");
     // Whether credentials (cookies/Authorization) may be sent with CORS requests
     private boolean allowCredentials = true;
     // How long (seconds) browsers may cache the CORS preflight response

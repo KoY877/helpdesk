@@ -36,9 +36,10 @@
     </mat-menu>
   </nav>
 
-  <!-- Main layout: fixed side navigation + routed content area -->
-  <mat-drawer-container class="container">
-    <mat-drawer mode="side" class="side" opened>
+}
+  <!-- Keep one outlet alive while authentication changes the surrounding shell. -->
+  <mat-drawer-container class="container" [style.height]="showShell() ? null : '100vh'">
+    <mat-drawer mode="side" class="side" [opened]="showShell()" [style.display]="showShell() ? null : 'none'">
       <ul class="side-items">
         <li class="side-item" routerLink="/dashboard" routerLinkActive="active">
           <mat-icon>dashboard</mat-icon> Dashboard
@@ -66,7 +67,3 @@
       <router-outlet />
     </mat-drawer-content>
   </mat-drawer-container>
-} @else {
-  <!-- Auth pages (login/register) render full-screen without the shell -->
-  <router-outlet />
-}

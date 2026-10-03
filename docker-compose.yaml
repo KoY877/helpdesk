@@ -1,7 +1,7 @@
 ﻿services:
   postgres:
     image: postgres:16-alpine
-    container_name: postgres-dev
+    container_name: postgres-dev-helpdesk
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -26,6 +26,9 @@
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: 3600000
+      ALLOWED_ORIGINS: http://localhost:4200
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,7 +40,10 @@
           path: ./backend/pom.xml
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        BUILD_CONFIGURATION: development
     container_name: helpdesk_frontend
     ports:
       - "4200:80"
@@ -45,9 +51,8 @@
       - backend
     develop:
       watch:
-        - action: sync
+        - action: rebuild
           path: ./frontend/src
-          target: /app/src
         - action: rebuild
           path: ./frontend/package.json
 
