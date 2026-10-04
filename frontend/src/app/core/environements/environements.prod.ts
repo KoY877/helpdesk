@@ -1,5 +1,5 @@
-/** Production environment settings: backend API base URL. */
+/** Production environment settings: same-origin API calls are routed via nginx. */
 export const environement = {
   production: true,
-  apiUrl: "https://api.koy877.dev/api"
+  apiUrl: "/api"
 }
