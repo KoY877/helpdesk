@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://helpdesk-7kaj.onrender.com/api/$1"
+    },
+    {
+      "src": "/login/oauth2/(.*)",
+      "dest": "https://helpdesk-7kaj.onrender.com/login/oauth2/$1"
+    },
+    {
+      "src": "/oauth2/(.*)",
+      "dest": "https://helpdesk-7kaj.onrender.com/oauth2/$1"
+    },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
