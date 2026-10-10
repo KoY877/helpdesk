@@ -19,11 +19,13 @@ export class OAuthCallbackComponent implements OnInit {
   message = 'Signing in with GitHub…';
 
   ngOnInit(): void {
-    const params = new URLSearchParams(this.route.snapshot.fragment ?? '');
+    const fragmentParams = new URLSearchParams(this.route.snapshot.fragment ?? '');
+    const queryParams = this.route.snapshot.queryParamMap;
+    const code = fragmentParams.get('code') ?? queryParams.get('code');
+    const error = fragmentParams.get('error') ?? queryParams.get('error');
     window.history.replaceState(null, '', window.location.pathname);
-    const code = params.get('code');
-    if (!code || params.has('error')) {
-      this.message = params.get('error') === 'account_link_required'
+    if (!code || error) {
+      this.message = error === 'account_link_required'
         ? 'An account already uses this email. Please sign in with your password.'
         : 'GitHub sign-in failed. Please try again.';
       return;

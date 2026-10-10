@@ -44,6 +44,7 @@ export class LoginComponent {
   /**
    * Submits the login form: authenticates, persists the session, then redirects.
    */
+  
   onSubmit(): void {
     // Ignore submissions while the form is invalid
      if (this.form.invalid) return;
@@ -63,6 +64,5 @@ export class LoginComponent {
         this.errorMessage = 'Invalid email or password.';
       }
     })
-
   }
 }

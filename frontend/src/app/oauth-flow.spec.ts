@@ -42,4 +42,30 @@ describe('GitHub callback with the real app layout', () => {
     http.verify();
     localStorage.clear();
   });
+
+  it('accepts OAuth codes coming from the query string as well as the hash fragment', async () => {
+    localStorage.clear();
+    TestBed.configureTestingModule({ imports: [App], providers: [
+      provideRouter([
+        { path: 'oauth/callback', component: OAuthCallbackComponent },
+        { path: 'dashboard', component: TestDashboard, canActivate: [authGuard] },
+      ]),
+      provideHttpClient(), provideHttpClientTesting(),
+      { provide: UserService, useValue: { getUserById: () => of({ name: 'GitHub User' }) } },
+    ] });
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/oauth/callback?code=query-code');
+    fixture.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    const exchange = http.expectOne(request => request.url.endsWith('/auth/oauth/exchange'));
+    expect(exchange.request.body).toEqual({ code: 'query-code' });
+    exchange.flush({ token: 'access', refreshToken: 'refresh', role: 'USER', userId: 'local-user' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(router.url).toBe('/dashboard');
+    http.verify();
+    localStorage.clear();
+  });
 });
