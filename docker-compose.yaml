@@ -30,6 +30,7 @@
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://helpdesk.koy877.dev}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_REDIRECT_URI: ${GITHUB_REDIRECT_URI:-https://helpdesk.koy877.dev/login/oauth2/code/github}
     depends_on:
       postgres:
         condition: service_healthy

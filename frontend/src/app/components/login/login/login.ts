@@ -44,10 +44,10 @@ export class LoginComponent {
   /**
    * Submits the login form: authenticates, persists the session, then redirects.
    */
-  
+
   onSubmit(): void {
     // Ignore submissions while the form is invalid
-     if (this.form.invalid) return;
+    if (this.form.invalid) return;
 
     this.authService.login(this.form.value).subscribe({
       next: (response) => {
